@@ -1,0 +1,29 @@
+#!/usr/bin/Rscript --silent
+
+library(optparse)
+
+option_list <- list(
+	make_option(c("-d", "--mydir"), type="character", default="*",
+	help="directory [default %default]",
+	metavar="number"),
+	make_option(c("-r", "--reg"), type="character", default="*",
+	help="templates [default %default]",
+	metavar="number"),
+	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
+	help="Print extra output [default=false]")
+)
+opt_parser <- OptionParser(usage = "usage: %prog [options]", option_list = option_list, description = "Post-proc object table", epilogue = "Send feedback to mackoel@gmail.com")
+flaggs <- parse_args(opt_parser, args = commandArgs(trailingOnly = TRUE), print_help_and_exit = TRUE, positional_arguments = TRUE)
+opts <- flaggs$options
+tmpls <- opts$reg
+mydir <- opts$mydir
+args <- flaggs$args
+outfile <- args[1]
+string_tmpls <- unlist(strsplit(tmpls,",",-1))
+fds <- do.call("c", lapply(string_tmpls, function(st) list.files(path = mydir, pattern = st, all.files = FALSE, full.names = TRUE, recursive = FALSE, ignore.case = FALSE, include.dirs = FALSE)))
+datatab <- do.call("rbind", lapply(fds, function(fd) read.csv(fd)))
+expres <- aggregate(x=datatab[-1], by=datatab[1], FUN=mean)
+expres_sd <- aggregate(x=datatab[-1], by=datatab[1], FUN=sd)
+colnames(expres_sd) <- paste0(colnames(expres), ".sd")
+write.csv(file=outfile, cbind(expres, expres_sd), row.names=F)
+
