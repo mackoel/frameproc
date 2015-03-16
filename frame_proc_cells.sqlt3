@@ -1,0 +1,6 @@
+INSERT INTO Operators (name, implementor, executable, type, Misc, Utility, inputs, outputs, uidescription, message, metaname, metaweight) VALUES ('frame_proc_cells','kkozlov','frame_proc_cells.R',1,1,1,'csv','csv','1;
+Time;string;0;
+
+-m $1;','Process table to aggregate info per cell
+INPUT: csv obj table
+OUTPUT: csv cell table','frame_proc_cells','0');

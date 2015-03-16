@@ -1,0 +1,73 @@
+#!/usr/bin/Rscript --silent
+# This script is the splitted cluster step from frame_proc
+library(fpc)
+library(optparse)
+
+cluster_cells = function(qdata, error, type=0, kmax) {
+	km <- rep(NA, (kmax-1))
+	i <- c(2)
+	OPTIMALK <- i
+#	algorithm = c("Hartigan-Wong", "Lloyd", "Forgy", "MacQueen")
+	algorithm = "Lloyd"
+	clus <- kmeans(qdata, i, algorithm = algorithm, iter.max=100000, nstart=10)
+	while ( i < kmax) {
+		clus <- kmeans(qdata, i, algorithm = algorithm, iter.max=100000, nstart=10)
+		km[i] <- sum( clus$withinss )
+		if (type > 0) {
+			km[i] <- sum( clus$betweenss )
+		}
+		if ( i > 2 & km[i]/km[i-1] <= error ) {
+			OPTIMALK <- i - 1
+			i <- kmax
+		} else {
+			i <- i + 1
+		}
+	}
+	clus <- kmeans(qdata, OPTIMALK, algorithm = algorithm, iter.max=100000, nstart=10)
+	return(list(OPTIMALK=OPTIMALK, clus=clus, km=km))
+}
+
+option_list <- list(
+	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
+	help="Print extra output [default=false]"),
+	make_option(c("-t", "--type"), type="integer", default=1,
+	help="0 - withinss, 1 - betweenss [default %default]",
+	metavar="number"),
+	make_option(c("-m", "--time"), type="integer", default=0,
+	help="minutes from start [default %default]",
+	metavar="number"),
+	make_option(c("-e", "--error"), type="double", default=1.04,
+	help = "Error [default %default]")
+)
+opt_parser <- OptionParser(usage = "usage: %prog [options]", option_list = option_list, description = "Post-proc object table", epilogue = "Send feedback to mackoel@gmail.com")
+flaggs <- parse_args(opt_parser, args = commandArgs(trailingOnly = TRUE), print_help_and_exit = TRUE, positional_arguments = TRUE)
+opts <- flaggs$options
+args <- flaggs$args
+infile <- args[1]
+outfiles <- unlist(strsplit(args[2], ",", fixed=TRUE))
+outfile <- outfiles[1]
+outfilecsv <- outfiles[2]
+filenm <- outfiles[3]
+qdata <- read.csv(infile)
+wdata <- qdata[,c("xmean", "ymean")]
+KMAX <- 100
+kmax <- KMAX
+if ( nrow(qdata) < KMAX ) {
+	kmax <- nrow(qdata)
+}
+cl <- cluster_cells(wdata, opts$error, 1, kmax)
+qdata <- cbind(qdata, cell=cl$clus$cluster)
+res_str <- paste("Number of cells = ", cl$OPTIMALK, sep="")
+png(filename = outfile, width = 300, height = 300, units = "px", pointsize = 12)
+plot(2:kmax, cl$km, xlab="K", ylab="sum(betweenss)", type="b", pch="+", main=paste0("Fitness vs number of clusters, ", opts$error))
+res <- dev.off()
+png(filename = filenm, width = 300, height = 300, units = "px", pointsize = 12)
+colours <- rainbow(cl$OPTIMALK)
+plot(qdata[qdata$cell == 1,]$xmean,1024-qdata[qdata$cell == 1,]$ymean,xlim=c(0,1024),ylim=c(0,1024),type='p',pch=1,col=colours[1],main="Cells",xlab="Column",ylab="Row",asp=1)
+for (i in 2:cl$OPTIMALK) {
+	lines(qdata[qdata$cell == i,]$xmean,1024-qdata[qdata$cell == i,]$ymean,type='p',pch=i,col=colours[i])
+}
+res <- dev.off()
+
+write.csv(file=outfilecsv, qdata, row.names=F)
+

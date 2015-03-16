@@ -1,0 +1,38 @@
+#!/usr/bin/Rscript --silent
+# This script is a splitted second step from frame_proc - the columns with ratios
+
+library(optparse)
+
+option_list <- list(
+	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
+	help="Print extra output [default=false]"),
+	make_option(c("-m", "--time"), type="character", default="",
+	help="minutes from start [default %default]",
+	metavar="number")
+)
+opt_parser <- OptionParser(usage = "usage: %prog [options]", option_list = option_list, description = "Post-proc object table", epilogue = "Send feedback to mackoel@gmail.com")
+flaggs <- parse_args(opt_parser, args = commandArgs(trailingOnly = TRUE), print_help_and_exit = TRUE, positional_arguments = TRUE)
+opts <- flaggs$options
+args <- flaggs$args
+infile <- args[1]
+outfile <- args[2]
+qdata <- read.csv(infile)
+colnames(qdata) <- sub("eea1", "green", colnames(qdata))
+colnames(qdata) <- sub("egfr", "red", colnames(qdata))
+colnames(qdata) <- sub("cort", "red", colnames(qdata))
+if ("cell" %in% colnames(qdata)) {
+	cat (infile, "cell column present\n")
+	OPTIMALK <- max(qdata$cell)
+} else {
+	cat (infile, "cell column absent\n")
+	OPTIMALK <- 1
+	qdata <- cbind(qdata, cell=rep(1, times=dim(qdata)[1]))
+}
+coloc_red <- qdata$overlap_mask_notempty/qdata$red_mask_notempty
+coloc_green <- qdata$overlap_mask_notempty/qdata$green_mask_notempty
+coloc_vol <- qdata$overlap_mask_notempty/qdata$m000
+coloc_cvol <- qdata$red_mask_notempty/qdata$m000
+coloc_evol <- qdata$green_mask_notempty/qdata$m000
+qdata <- cbind(qdata, coloc_red, coloc_green, coloc_vol, coloc_cvol, coloc_evol)
+write.csv(file=outfile, qdata, row.names=F)
+

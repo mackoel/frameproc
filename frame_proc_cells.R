@@ -1,0 +1,115 @@
+#!/usr/bin/Rscript --silent
+# This script is a splitted 3 step from frame-proc - stats per cell
+
+library(optparse)
+
+aggr_func_dco <- function(cell, datatab) {
+	result <- cor(datatab[datatab$cell == cell,]$green_mean, datatab[datatab$cell == cell,]$red_mean, method = 'pearson')
+	return(result)
+}
+
+aggr_func_mco <- function(cell, datatab) {
+	result <- mean(datatab[datatab$cell == cell,]$overlap_mask_notempty/datatab[datatab$cell == cell,]$m000)
+	return(result)
+}
+
+aggr_func_nco <- function(cell, datatab) {
+	result <- cor(datatab[datatab$cell == cell,]$green_median, datatab[datatab$cell == cell,]$red_median, method = 'pearson')
+	return(result)
+}
+
+aggr_func_cco <- function(cell, datatab) {
+	result <- cor(datatab[datatab$cell == cell,]$green_mask_notempty, datatab[datatab$cell == cell,]$red_mask_notempty, method = 'pearson')
+	return(result)
+}
+
+aggr_func_hist <- function(cell, datatab, datacolmn) {
+	my_data = na.omit(datacolmn[datatab$cell == cell])
+	my_data <- my_data[(0 <= my_data) & (my_data <= 1)]
+	coloc_hist <- hist(my_data, plot = F, breaks=seq(0, 1, by=0.1))
+	result <- coloc_hist$counts
+	return(result)
+}
+
+aggr_func_manders <- function(cell, datatab, channel, threshold = 0) {
+	if (channel == 1) {
+		G = datatab[datatab$cell == cell,]$green_mean
+		R = G * (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
+	} else if (channel == 2) {
+		G = datatab[datatab$cell == cell,]$red_mean
+		R = G * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
+	}
+#	print(data.frame(R, G))
+	result <- sum(R)/sum(G)
+	return(result)
+}
+
+option_list <- list(
+	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
+	help="Print extra output [default=false]"),
+	make_option(c("-m", "--time"), type="character", default="",
+	help="minutes from start [default %default]",
+	metavar="number")
+)
+opt_parser <- OptionParser(usage = "usage: %prog [options]", option_list = option_list, description = "Post-proc object table", epilogue = "Send feedback to mackoel@gmail.com")
+flaggs <- parse_args(opt_parser, args = commandArgs(trailingOnly = TRUE), print_help_and_exit = TRUE, positional_arguments = TRUE)
+opts <- flaggs$options
+args <- flaggs$args
+infile <- args[1]
+outfile <- args[2]
+qdata <- read.csv(infile)
+colnames(qdata) <- sub("eea1", "green", colnames(qdata))
+colnames(qdata) <- sub("egfr", "red", colnames(qdata))
+colnames(qdata) <- sub("cort", "red", colnames(qdata))
+OPTIMALK <- max(qdata$cell)
+cat(infile, "OPTIMALK", OPTIMALK, "\n");
+dco <- sapply(seq(1:OPTIMALK), FUN=aggr_func_dco, datatab=qdata)
+mco <- sapply(seq(1:OPTIMALK), FUN=aggr_func_mco, datatab=qdata)
+nco <- sapply(seq(1:OPTIMALK), FUN=aggr_func_nco, datatab=qdata)
+cco <- sapply(seq(1:OPTIMALK), FUN=aggr_func_cco, datatab=qdata)
+manders1 <- sapply(seq(1:OPTIMALK), FUN=aggr_func_manders, datatab=qdata, channel=1)
+manders2 <- sapply(seq(1:OPTIMALK), FUN=aggr_func_manders, datatab=qdata, channel=2)
+coloc_red_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_red)
+coloc_green_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_green)
+coloc_vol_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_vol)
+coloc_cvol_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_cvol)
+coloc_evol_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_evol)
+if (opts$time == "CC") {
+	T <- -1
+} else {
+	T <- as.numeric(opts$time)
+}
+
+restab <- data.frame(
+	time=rep(T, OPTIMALK),
+	cell=seq(1:OPTIMALK),
+	dco=dco,
+	mco=mco,
+	nco=nco,
+	cco=cco,
+	manders1 = manders1,
+	manders2 = manders2
+	)
+
+tt <- data.frame(t(coloc_red_counts))
+colnames(tt) <- sapply(seq(1:10), FUN=function(i) paste0("red_counts",i))
+restab <- cbind(restab,tt)
+
+tt <- data.frame(t(coloc_green_counts))
+colnames(tt) <- sapply(seq(1:10), FUN=function(i) paste0("green_counts",i))
+restab <- cbind(restab,tt)
+
+tt <- data.frame(t(coloc_vol_counts))
+colnames(tt) <- sapply(seq(1:10), FUN=function(i) paste0("vol_counts",i))
+restab <- cbind(restab,tt)
+
+tt <- data.frame(t(coloc_cvol_counts))
+colnames(tt) <- sapply(seq(1:10), FUN=function(i) paste0("cvol_counts",i))
+restab <- cbind(restab,tt)
+
+tt <- data.frame(t(coloc_evol_counts))
+colnames(tt) <- sapply(seq(1:10), FUN=function(i) paste0("evol_counts",i))
+restab <- cbind(restab,tt)
+
+write.csv(file=outfile, restab, row.names=F)
+
