@@ -1,7 +1,7 @@
 #!/usr/bin/Rscript --silent
 rem <- function(...) invisible(T)
 rem( '
-Rscript.exe "%~F0"
+Rscript.exe "%~F0" "%1" "%2" "%3" "%4" "%~F5"
 EXIT /B
 rem ')
 ### above=BAT, below=R

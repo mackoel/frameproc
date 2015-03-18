@@ -1,4 +1,4 @@
-INSERT INTO Operators (name, implementor, executable, type, Misc, Utility, inputs, outputs, uidescription, message, metaname, metaweight) VALUES ('frame_proc_obj','kkozlov','frame_proc_obj.R',1,1,1,'csv','csv','1;
+INSERT INTO Operators (name, implementor, executable, type, Misc, Utility, inputs, outputs, uidescription, message, metaname, metaweight) VALUES ('frame_proc_obj','kkozlov','frame_proc_obj',1,1,1,'csv','csv','1;
 Time;string;0;
 
 -m $1;','Process table to add columns with ratios
