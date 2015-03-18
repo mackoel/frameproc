@@ -1,0 +1,55 @@
+#!Nsis Installer Command Script
+#
+# This is an NSIS Installer Command Script generated automatically
+# by the Fedora nsiswrapper program.  For more information see:
+#
+#   http://fedoraproject.org/wiki/MinGW
+#
+# To build an installer from the script you would normally do:
+#
+#   makensis this_script
+# InstallDirRegKey HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Enviroment\KIMONO_HOME" "Install_Dir"
+# which will generate the output file 'ProStack-__VERSION__-__RELEASE__.i386.setup.exe' which is a Windows
+# installer containing your program.
+!include "EnvVarUpdate.nsh"
+Name "FrameProc"
+OutFile "FrameProc-__VERSION__-__RELEASE__.win.i386.setup.exe"
+InstallDir ""
+# Icon "../ProStack.ico"
+
+ShowInstDetails hide
+ShowUninstDetails hide
+
+# Uncomment this to enable BZip2 compression, which results in
+# slightly smaller files but uses more memory at install time.
+SetCompressor bzip2
+
+XPStyle on
+
+Page directory
+Page instfiles
+
+DirText "Please select the installation folder."
+
+Section "FrameProc"
+  SetOutPath "$INSTDIR"
+  File /oname=frame_proc_cells.bat "./frame_proc_cells"
+  File /oname=frame_proc_clust.bat "./frame_proc_clust"
+  File /oname=frame_proc_filt.bat "./frame_proc_filt"
+  File /oname=frame_proc_obj.bat "./frame_proc_obj"
+  File /oname=series_proc_graph.bat "./series_proc_graph"
+  File /oname=series_proc_table.bat "./series_proc_table"
+
+  ReadEnvStr $0 COMSPEC
+  SetOutPath "$INSTDIR"
+  ${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR"
+SectionEnd
+
+Section "Uninstall"
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "Install_Dir\bin"
+SectionEnd
+
+Section -post
+  WriteUninstaller "$INSTDIR\Uninstall FrameProc.exe"
+SectionEnd
+
