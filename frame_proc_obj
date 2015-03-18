@@ -1,6 +1,11 @@
 #!/usr/bin/Rscript --silent
 # This script is a splitted second step from frame_proc - the columns with ratios
-
+rem <- function(...) invisible(T)
+rem( '
+Rscript.exe "%~F0" "%1" "%2" "%~F3" "%~F4"
+EXIT /B
+rem ')
+### above=BAT, below=R
 library(optparse)
 
 option_list <- list(

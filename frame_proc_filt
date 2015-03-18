@@ -1,5 +1,16 @@
 #!/usr/bin/Rscript --silent
-
+rem <- function(...) invisible(T)
+rem( '
+set opt0="%~F0"
+set opt1="%1"
+set opt2="%2"
+shift
+shift
+shift
+Rscript.exe %opt0% %opt1% %opt2% "%0" "%1" "%2" "%3" "%4" "%5" "%6" "%7" "%~F8" "%~F9"
+EXIT /B
+rem ')
+### above=BAT, below=R
 library(optparse)
 
 option_list <- list(
@@ -37,7 +48,7 @@ q <- read.csv(infile)
 colnames(q) <- sub("eea1", "green", colnames(q))
 colnames(q) <- sub("egfr", "red", colnames(q))
 colnames(q) <- sub("cort", "red", colnames(q))
-pdf(file = outgraph)
+pdf(file = basename(outgraph))
 hist(q$red_mean, breaks=seq(from=0,to=255,length=opts$breaks), main="red", xlim=c(0, opts$breaks))
 hist(q$green_mean, breaks=seq(from=0,to=255,length=opts$breaks), main="green", xlim=c(0, opts$breaks))
 q <- q[(q$green_mean >= a) & (q$green_mean < b) & (q$red_mean >= c) & (q$red_mean < d),]

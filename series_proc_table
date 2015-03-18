@@ -1,5 +1,10 @@
 #!/usr/bin/Rscript --silent
-
+rem <- function(...) invisible(T)
+rem( '
+Rscript.exe "%~F0"
+EXIT /B
+rem ')
+### above=BAT, below=R
 library(optparse)
 
 option_list <- list(

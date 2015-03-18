@@ -1,5 +1,11 @@
 #!/usr/bin/Rscript --silent
 # This script is the splitted cluster step from frame_proc
+rem <- function(...) invisible(T)
+rem( '
+Rscript.exe "%~F0" "%1" "%2" "%3" "%4" "%5" "%6"  "%~F7" "%~F8"
+EXIT /B
+rem ')
+### above=BAT, below=R
 library(fpc)
 library(optparse)
 
@@ -58,10 +64,10 @@ if ( nrow(qdata) < KMAX ) {
 cl <- cluster_cells(wdata, opts$error, 1, kmax)
 qdata <- cbind(qdata, cell=cl$clus$cluster)
 res_str <- paste("Number of cells = ", cl$OPTIMALK, sep="")
-png(filename = outfile, width = 300, height = 300, units = "px", pointsize = 12)
+png(filename = basename(outfile), width = 300, height = 300, units = "px", pointsize = 12)
 plot(2:kmax, cl$km, xlab="K", ylab="sum(betweenss)", type="b", pch="+", main=paste0("Fitness vs number of clusters, ", opts$error))
 res <- dev.off()
-png(filename = filenm, width = 300, height = 300, units = "px", pointsize = 12)
+png(filename = basename(filenm), width = 300, height = 300, units = "px", pointsize = 12)
 colours <- rainbow(cl$OPTIMALK)
 plot(qdata[qdata$cell == 1,]$xmean,1024-qdata[qdata$cell == 1,]$ymean,xlim=c(0,1024),ylim=c(0,1024),type='p',pch=1,col=colours[1],main="Cells",xlab="Column",ylab="Row",asp=1)
 for (i in 2:cl$OPTIMALK) {

@@ -1,6 +1,11 @@
 #!/usr/bin/Rscript --silent
 # This script is a splitted 3 step from frame-proc - stats per cell
-
+rem <- function(...) invisible(T)
+rem( '
+Rscript.exe "%~F0" "%1" "%2" "%~F3" "%~F4"
+EXIT /B
+rem ')
+### above=BAT, below=R
 library(optparse)
 
 aggr_func_dco <- function(cell, datatab) {
