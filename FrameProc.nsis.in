@@ -37,8 +37,7 @@ Section "FrameProc"
   File /oname=frame_proc_clust.bat "./frame_proc_clust"
   File /oname=frame_proc_filt.bat "./frame_proc_filt"
   File /oname=frame_proc_obj.bat "./frame_proc_obj"
-  File /oname=series_proc_graph.bat "./series_proc_graph"
-  File /oname=series_proc_table.bat "./series_proc_table"
+  File /oname=series_proc_summary.bat "./series_proc_summary"
 
   ReadEnvStr $0 COMSPEC
   SetOutPath "$INSTDIR"
