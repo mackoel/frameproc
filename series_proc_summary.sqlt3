@@ -1,0 +1,4 @@
+INSERT INTO Operators (name, implementor, executable, type, Misc, Utility, inputs, outputs, uidescription, message, metaname, metaweight) VALUES ('series_proc_summary','kkozlov','series_proc_summary',1,1,1,'','csv,pdf','N/A','Process tables to get summary statistics
+OUTPUT: 
+csv with summaries
+pdf with summaries','series_proc_summary','0');
