@@ -12,7 +12,7 @@ n=1
 # kozlov_kn@spbstu.ru
 Name=Process HeLa cells
 Name[ru]=Обработка клеток HeLa
-nodes=86
+nodes=87
 
 [Node:59]
 info=0;195;37;30;35;0;0;0;0;0;0;0;0;0;
@@ -86,7 +86,7 @@ password=
 330.1=331.1;333.1;336.2;337.2;340.2;347.2;348.2;365.2;
 332.1=333.2
 333.1=340.1
-334.1=335.1
+334.1=335.1;382.1;
 336.1=337.3
 337.1=347.3
 339.1=329.1;329.2;
@@ -388,7 +388,7 @@ vip=0
 label=invert
 
 [Node:281]
-info=0;408;711;30;50;0;0;0;0;0;0;0;0;0;
+info=0;408;711;30;50;0;0;0;0;0;0;0;0;1;
 id=-r 1
 type=PAM
 file=.any
@@ -396,9 +396,9 @@ name=median
 version=6.1.0
 use_metaname=0
 server=default
-delay=60
-vip=0
-label=median
+delay=600
+vip=1
+label=ANCHOR RUN
 
 [Node:282]
 info=0;531;651;30;35;0;0;0;0;0;0;0;0;0;
@@ -410,8 +410,8 @@ version=6.1.0
 use_metaname=0
 server=default
 delay=60
-vip=0
-label=strel
+vip=1
+label=ANCHOR SIZE
 
 [Node:283]
 info=0;473;645;30;35;0;0;0;0;0;0;0;0;0;
@@ -448,7 +448,7 @@ name=median
 version=6.1.0
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=median
 
@@ -669,7 +669,7 @@ name=median
 version=6.1.0
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=median
 
@@ -844,7 +844,7 @@ vip=0
 label=SAVE_merged_kontur
 
 [Node:346]
-info=0;457;1325;30;35;0;0;0;0;0;0;0;0;1;
+info=0;457;1325;30;35;0;0;0;0;0;0;0;0;0;
 id=
 type=PAM
 file=.any
@@ -867,10 +867,10 @@ use_metaname=0
 server=default
 delay=60
 vip=0
-label=qu3d_eea1_mask
+label=qu3d_green_mask
 
 [Node:348]
-info=0;599;1286;30;65;0;0;0;0;0;0;0;0;0;
+info=0;629;1284;30;65;0;0;0;0;0;0;0;0;0;
 id=-r 26 -s red_mask
 type=PAM
 file=.any
@@ -880,7 +880,7 @@ use_metaname=0
 server=default
 delay=60
 vip=0
-label=qu3d_egfr_mask
+label=qu3d_red_mask
 
 [Node:349]
 info=0;210;961;30;50;0;0;0;0;0;0;0;0;0;
@@ -919,7 +919,7 @@ vip=0
 label=SAVE_red_mask
 
 [Node:352]
-info=0;626;1441;30;35;0;0;0;0;0;0;0;0;0;
+info=0;952;1451;30;35;0;0;0;0;0;0;0;0;0;
 id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/-green_mask.tif
@@ -1007,7 +1007,7 @@ vip=0
 label=blob
 
 [Node:364]
-info=0;648;1023;30;35;0;0;0;0;0;0;0;0;0;
+info=0;840;1080;30;35;0;0;0;0;0;0;0;0;0;
 id=
 type=PAM
 file=.any
@@ -1033,7 +1033,7 @@ vip=0
 label=qu3d_overlap_mask
 
 [Node:366]
-info=0;497;1432;30;35;0;0;0;0;0;0;0;0;0;
+info=0;864;1444;30;35;0;0;0;0;0;0;0;0;0;
 id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/-overlap_mask.tif
@@ -1103,7 +1103,7 @@ name=median
 version=6.1.0
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=median
 
@@ -1155,7 +1155,7 @@ name=median
 version=6.1.0
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=median
 
@@ -1194,3 +1194,13 @@ server=default
 delay=60
 vip=0
 label=convert
+
+[Node:382]
+info=0;192;1363;30;35;0;0;0;0;0;0;0;0;0;
+id=glaz %s %s
+type=DISPLAY
+name=display
+server=default
+delay=60
+vip=0
+label=Overlay
