@@ -2,6 +2,13 @@
 
 [Workspace]
 n=1
+# This sceanrio computes various quantities
+# from tables with quantitative information
+# extracted from mages with single cells.
+#
+# kozlov_kn@spbstu.ru
+Name=Processing of quantitative tables
+Name[ru]=Пост-обработка количественной информации
 nodes=7
 
 [Node:0]

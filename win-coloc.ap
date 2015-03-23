@@ -2,6 +2,16 @@
 
 [Workspace]
 n=1
+# This sceanrio processes confocal images of HeLa
+# cells. The input are two color images - one with 
+# data in red channel, another - with data
+# in green channel.
+# Parameters for object recognition can be adjusted.
+# The output consistes of several images and tables.
+#
+# kozlov_kn@spbstu.ru
+Name=Process HeLa cells
+Name[ru]=Обработка клеток HeLa
 nodes=86
 
 [Node:59]

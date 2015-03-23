@@ -2,6 +2,14 @@
 
 [Workspace]
 n=1
+# This sceanrio cluster objects that belong to one cell
+# and, conseuently, computes various quantities
+# from tables with quantitative information
+# extracted from mages with single cells.
+#
+# kozlov_kn@spbstu.ru
+Name=Clustering and Processing of quantitative tables
+Name[ru]=Кластеризация и пост-обработка количественной информации
 nodes=11
 
 [Node:0]

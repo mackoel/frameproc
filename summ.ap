@@ -2,6 +2,11 @@
 
 [Workspace]
 n=1
+# This sceanrio computes various statistics.
+#
+# kozlov_kn@spbstu.ru
+Name=Summary statistics
+Name[ru]=Статобработка
 nodes=3
 
 [Node:0]
