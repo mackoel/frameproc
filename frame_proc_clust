@@ -4,7 +4,7 @@ rem <- function(...) invisible(T)
 rem( '
 set opt0="%~F0"
 shift
-Rscript.exe %opt0% "%0" "%1" "%2" "%3" "%4" "%5" "%6"  "%~F7","%~F8","%~F9"
+Rscript.exe %opt0% "%0" "%1" "%2" "%3" "%4" "%5" "%6" "%~F7","%~F8","%~F9"
 EXIT /B
 rem ')
 ### above=BAT, below=R
@@ -63,7 +63,7 @@ kmax <- KMAX
 if ( nrow(qdata) < KMAX ) {
 	kmax <- nrow(qdata)
 }
-cl <- cluster_cells(wdata, opts$error, 1, kmax)
+cl <- cluster_cells(wdata, opts$error, opt$type, kmax)
 qdata <- cbind(qdata, cell=cl$clus$cluster)
 res_str <- paste("Number of cells = ", cl$OPTIMALK, sep="")
 png(filename = basename(outfile), width = 300, height = 300, units = "px", pointsize = 12)

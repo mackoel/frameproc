@@ -6,7 +6,7 @@ NAME="prostack-6.1.0"
 ROOT=`pwd`
 BUILDROOT="buildroot"
 BUILD="build"
-VERSION="0.3"
+VERSION="0.4"
 RELEASE="0"
 
 cat FrameProc.nsis.in | sed -e "s/__VERSION__/$VERSION/g" -e "s/__RELEASE__/$RELEASE/g" > FrameProc.nsis
