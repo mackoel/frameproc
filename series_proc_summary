@@ -1,7 +1,7 @@
 #!/usr/bin/Rscript --silent
 rem <- function(...) invisible(T)
 rem( '
-Rscript.exe "%~F0" "%1"
+Rscript.exe "%~F0" "%~F1","%~F2"
 EXIT /B
 rem ')
 ### above=BAT, below=R
@@ -111,11 +111,10 @@ ReturnVal <- templateDialog("Enter templates", "Condition", number_of_conditions
 
 outfiles <- unlist(strsplit(args[1], ",", fixed=TRUE))
 outfile <- outfiles[1]
-outgraph <- outfiles[2]
+outgraph <- basename(outfiles[2])
 
 #string_tmpls <- unlist(strsplit(tmpls,",",-1))
 string_tmpls <- ReturnVal
-string_tmpls
 fds <- do.call("c", lapply(string_tmpls, function(st) list.files(path = mydir, pattern = st, all.files = FALSE, full.names = TRUE, recursive = FALSE, ignore.case = FALSE, include.dirs = FALSE)))
 datatab <- do.call("rbind", lapply(fds, function(fd) read.csv(fd)))
 expres <- aggregate(x=datatab[-1], by=datatab[1], FUN=mean)
