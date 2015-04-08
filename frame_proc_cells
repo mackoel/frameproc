@@ -2,7 +2,7 @@
 # This script is a splitted 3 step from frame-proc - stats per cell
 rem <- function(...) invisible(T)
 rem( '
-Rscript.exe "%~F0" "%1" "%2" "%~F3" "%~F4"
+Rscript.exe "%~F0" "%1" "%2" "%3" "%4" "%~F5" "%~F6"
 EXIT /B
 rem ')
 ### above=BAT, below=R
@@ -36,6 +36,13 @@ aggr_func_hist <- function(cell, datatab, datacolmn) {
 	return(result)
 }
 
+aggr_func_hist_size <- function(cell, datatab, datacolmn, sizebreaks) {
+	my_data = na.omit(datacolmn[datatab$cell == cell])
+	hist_size <- hist(my_data, plot = F, breaks=sizebreaks)
+	result <- hist_size$counts
+	return(result)
+}
+
 aggr_func_manders <- function(cell, datatab, channel, threshold = 0) {
 	if (channel == 1) {
 		G = datatab[datatab$cell == cell,]$green_mean
@@ -52,6 +59,9 @@ aggr_func_manders <- function(cell, datatab, channel, threshold = 0) {
 option_list <- list(
 	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
 	help="Print extra output [default=false]"),
+	make_option(c("-b", "--sizebreaks"), type="integer", default=4,
+	help="number of bars in hist [default %default]",
+	metavar="number"),
 	make_option(c("-m", "--time"), type="character", default="",
 	help="minutes from start [default %default]",
 	metavar="number")
@@ -114,6 +124,11 @@ restab <- cbind(restab,tt)
 
 tt <- data.frame(t(coloc_evol_counts))
 colnames(tt) <- sapply(seq(1:10), FUN=function(i) paste0("evol_counts",i))
+restab <- cbind(restab,tt)
+
+size_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area, sizebreaks=opts$sizebreaks)
+tt <- data.frame(t(size_counts))
+colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_counts",i))
 restab <- cbind(restab,tt)
 
 write.csv(file=outfile, restab, row.names=F)

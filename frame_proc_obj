@@ -2,7 +2,7 @@
 # This script is a splitted second step from frame_proc - the columns with ratios
 rem <- function(...) invisible(T)
 rem( '
-Rscript.exe "%~F0" "%1" "%2" "%~F3" "%~F4"
+Rscript.exe "%~F0" "%1" "%2" "%3" "%4" "%~F5" "%~F6"
 EXIT /B
 rem ')
 ### above=BAT, below=R
@@ -11,6 +11,9 @@ library(optparse)
 option_list <- list(
 	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
 	help="Print extra output [default=false]"),
+	make_option(c("-r", "--realsize"), type="double", default="1.0",
+	help="real size factor [default %default]",
+	metavar="number"),
 	make_option(c("-m", "--time"), type="character", default="",
 	help="minutes from start [default %default]",
 	metavar="number")
@@ -38,6 +41,8 @@ coloc_green <- qdata$overlap_mask_notempty/qdata$green_mask_notempty
 coloc_vol <- qdata$overlap_mask_notempty/qdata$m000
 coloc_cvol <- qdata$red_mask_notempty/qdata$m000
 coloc_evol <- qdata$green_mask_notempty/qdata$m000
-qdata <- cbind(qdata, coloc_red, coloc_green, coloc_vol, coloc_cvol, coloc_evol)
+real_area <- qdata$m000 * opts$realsize * opts$realsize
+real_radius <- sqrt(qdata$m000/pi) * opts$realsize
+qdata <- cbind(qdata, coloc_red, coloc_green, coloc_vol, coloc_cvol, coloc_evol, real_area, real_radius)
 write.csv(file=outfile, qdata, row.names=F)
 
