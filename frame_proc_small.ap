@@ -7,17 +7,19 @@ n=1
 # extracted from mages with single cells.
 #
 # kozlov_kn@spbstu.ru
+#
+#
 Name=Processing of quantitative tables
 Name[ru]=Пост-обработка количественной информации
 nodes=7
 
 [Node:0]
 info=0;107;370;30;35;0;0;0;0;0;0;0;0;0;
-id=-m 0
+id=-m 0 -r 116.0
 type=PAM
 file=.any
 name=frame_proc_obj
-version=6.1.0
+version=6.1.1
 use_metaname=0
 server=default
 delay=60
@@ -46,7 +48,7 @@ id=-a 0 -b 255 -c 0 -d 255 -k 100
 type=PAM
 file=.any,.any
 name=frame_proc_filt
-version=6.1.0
+version=6.1.1
 use_metaname=0
 server=default
 delay=60
@@ -55,11 +57,11 @@ label=frame_proc_filt
 
 [Node:3]
 info=0;57;425;30;35;0;0;0;0;0;0;0;0;1;
-id=-m 0
+id=-m 0 -b 5 -r 200
 type=PAM
 file=.any
 name=frame_proc_cells
-version=6.1.0
+version=6.1.1
 use_metaname=0
 server=default
 delay=60
@@ -70,7 +72,7 @@ label=frame_proc_cells
 info=0;125;21;30;35;0;0;0;0;0;0;0;0;0;
 id=
 type=INS
-file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/cort%2012_05_14/max0/00_011_MAX-00_merged_counts.csv
+file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/cort%2012_05_14/max0/_counts.csv
 server=default
 delay=60
 vip=0

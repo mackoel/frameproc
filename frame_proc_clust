@@ -63,7 +63,7 @@ kmax <- KMAX
 if ( nrow(qdata) < KMAX ) {
 	kmax <- nrow(qdata)
 }
-cl <- cluster_cells(wdata, opts$error, opt$type, kmax)
+cl <- cluster_cells(wdata, opts$error, opts$type, kmax)
 qdata <- cbind(qdata, cell=cl$clus$cluster)
 res_str <- paste("Number of cells = ", cl$OPTIMALK, sep="")
 png(filename = basename(outfile), width = 300, height = 300, units = "px", pointsize = 12)

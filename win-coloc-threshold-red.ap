@@ -24,7 +24,7 @@ name=decinv_i
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=decinv_i
 
@@ -126,7 +126,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp/localhost:7778
 type=INS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/data/_ch00_15.tif
 server=default
-delay=60
+delay=600
 vip=0
 label=OPEN-green
 
@@ -139,7 +139,7 @@ name=decinv_i
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=decinv_i
 
@@ -152,7 +152,7 @@ name=hno
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=hno
 
@@ -165,7 +165,7 @@ name=hno
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=hno
 
@@ -178,7 +178,7 @@ name=vaff
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=vaff
 
@@ -191,7 +191,7 @@ name=threshold
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=threshold
 
@@ -204,7 +204,7 @@ name=blob
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=blob
 
@@ -217,7 +217,7 @@ name=bolb
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=bolb
 
@@ -230,7 +230,7 @@ name=mpad
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mpad
 
@@ -243,7 +243,7 @@ name=mcrop
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mcrop
 
@@ -256,7 +256,7 @@ name=gerosion
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=gerosion
 
@@ -269,7 +269,7 @@ name=reconstruct
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=reconstruct
 
@@ -282,7 +282,7 @@ name=despekle
 version=6.1.1
 use_metaname=0
 server=default
-delay=6000
+delay=60000
 vip=0
 label=despekle
 
@@ -295,7 +295,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=1
 label=ADJUST GREEN
 
@@ -308,7 +308,7 @@ name=vmax
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=vmax
 
@@ -321,7 +321,7 @@ name=shrink
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=shrink
 
@@ -334,7 +334,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -347,7 +347,7 @@ name=gerosion
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=gerosion
 
@@ -360,7 +360,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=strel
 
@@ -373,7 +373,7 @@ name=cwtsd
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=cwtsd
 
@@ -386,7 +386,7 @@ name=invert
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=invert
 
@@ -399,7 +399,7 @@ name=median
 version=6.1.1
 use_metaname=0
 server=default
-delay=600
+delay=6000
 vip=1
 label=ANCHOR RUN
 
@@ -412,7 +412,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=1
 label=ANCHOR SIZE
 
@@ -425,7 +425,7 @@ name=distance
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=distance
 
@@ -438,7 +438,7 @@ name=expand
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=expand
 
@@ -451,7 +451,7 @@ name=median
 version=6.1.1
 use_metaname=0
 server=default
-delay=600
+delay=6000
 vip=0
 label=median
 
@@ -464,7 +464,7 @@ name=threshold
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=threshold
 
@@ -477,7 +477,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=strel
 
@@ -490,7 +490,7 @@ name=reconstruct
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=reconstruct
 
@@ -503,7 +503,7 @@ name=gerosion
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=gerosion
 
@@ -516,7 +516,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=strel
 
@@ -529,7 +529,7 @@ name=mcrop
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mcrop
 
@@ -542,7 +542,7 @@ name=vaff
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=vaff
 
@@ -555,7 +555,7 @@ name=mpad
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mpad
 
@@ -568,7 +568,7 @@ name=reconstruct
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=reconstruct
 
@@ -581,7 +581,7 @@ name=gerosion
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=gerosion
 
@@ -594,7 +594,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=1
 label=ADJUST RED
 
@@ -607,7 +607,7 @@ name=despekle
 version=6.1.1
 use_metaname=0
 server=default
-delay=6000
+delay=60000
 vip=0
 label=despekle
 
@@ -620,7 +620,7 @@ name=blob
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=blob
 
@@ -633,7 +633,7 @@ name=bolb
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=bolb
 
@@ -646,7 +646,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -659,7 +659,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -672,7 +672,7 @@ name=median
 version=6.1.1
 use_metaname=0
 server=default
-delay=600
+delay=6000
 vip=0
 label=median
 
@@ -685,7 +685,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=strel
 
@@ -698,7 +698,7 @@ name=blob
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=blob
 
@@ -711,7 +711,7 @@ name=bolb
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=bolb
 
@@ -721,7 +721,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/cort%2012_05_14/max/-merged_mask.tif
 server=default
-delay=60
+delay=600
 vip=0
 label=SAVE_merged_mask
 
@@ -734,7 +734,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=strel
 
@@ -747,7 +747,7 @@ name=gdilation
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=gdilation
 
@@ -760,7 +760,7 @@ name=movl3
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=movl3
 
@@ -770,7 +770,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/-_merged_movl.tif
 server=default
-delay=60
+delay=600
 vip=0
 label=SAVE_merged_movl
 
@@ -783,7 +783,7 @@ name=qu3dinit
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=qu3dinit
 
@@ -796,7 +796,7 @@ name=qu3d
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=qu3d
 
@@ -806,7 +806,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/-merged_counts.csv
 server=default
-delay=60
+delay=600
 vip=0
 label=SAVE_merged_counts
 
@@ -819,7 +819,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -832,7 +832,7 @@ name=vaff
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=vaff
 
@@ -842,7 +842,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/-merged_kontur.tif
 server=default
-delay=60
+delay=600
 vip=0
 label=SAVE_merged_kontur
 
@@ -855,7 +855,7 @@ name=qu3d2csv
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=qu3d2csv
 
@@ -868,7 +868,7 @@ name=qu3d
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=qu3d_green_mask
 
@@ -881,7 +881,7 @@ name=qu3d
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=qu3d_red_mask
 
@@ -894,7 +894,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -907,7 +907,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -917,7 +917,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/-_red_mask.tif
 server=default
-delay=60
+delay=600
 vip=0
 label=SAVE_red_mask
 
@@ -927,7 +927,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/-green_mask.tif
 server=default
-delay=60
+delay=600
 vip=0
 label=SAVE_green_mask
 
@@ -940,7 +940,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -953,7 +953,7 @@ name=expand
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=expand
 
@@ -966,7 +966,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -979,7 +979,7 @@ name=shrink
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=shrink
 
@@ -992,7 +992,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -1005,7 +1005,7 @@ name=blob
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=blob
 
@@ -1018,7 +1018,7 @@ name=bolb
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=bolb
 
@@ -1031,7 +1031,7 @@ name=qu3d
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=qu3d_overlap_mask
 
@@ -1041,7 +1041,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/-overlap_mask.tif
 server=default
-delay=60
+delay=600
 vip=0
 label=SAVE_overlap_mask
 
@@ -1054,7 +1054,7 @@ name=invert
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=invert
 
@@ -1067,7 +1067,7 @@ name=gerosion
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=gerosion
 
@@ -1080,7 +1080,7 @@ name=reconstruct
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=reconstruct
 
@@ -1093,7 +1093,7 @@ name=invert
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=invert
 
@@ -1106,7 +1106,7 @@ name=median
 version=6.1.1
 use_metaname=0
 server=default
-delay=600
+delay=6000
 vip=0
 label=median
 
@@ -1119,7 +1119,7 @@ name=strel
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=strel
 
@@ -1132,7 +1132,7 @@ name=invert
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=invert
 
@@ -1145,7 +1145,7 @@ name=invert
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=invert
 
@@ -1158,7 +1158,7 @@ name=median
 version=6.1.1
 use_metaname=0
 server=default
-delay=600
+delay=6000
 vip=0
 label=median
 
@@ -1168,7 +1168,7 @@ id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp/localhost:7778
 type=INS
 file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/work/data/_ch01_15.tif
 server=default
-delay=60
+delay=600
 vip=0
 label=OPEN-red
 
@@ -1181,7 +1181,7 @@ name=convert
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=convert
 
@@ -1194,7 +1194,7 @@ name=convert
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=convert
 
@@ -1204,7 +1204,7 @@ id=glaz %s %s
 type=DISPLAY
 name=display
 server=default
-delay=60
+delay=600
 vip=0
 label=Overlay
 
@@ -1217,7 +1217,7 @@ name=mul
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=0
 label=mul
 
@@ -1230,6 +1230,6 @@ name=threshold
 version=6.1.1
 use_metaname=0
 server=default
-delay=60
+delay=600
 vip=1
 label=THRESHOLD red

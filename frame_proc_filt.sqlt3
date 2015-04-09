@@ -1,4 +1,4 @@
-INSERT INTO Operators (name, implementor, executable, type, Misc, Utility, inputs, outputs, uidescription, message, metaname, metaweight) VALUES ('frame_proc_filt','kkozlov','frame_proc_filt',1,1,1,'csv','csv,pdf','5;
+INSERT INTO Operators (name, implementor, executable, type, Misc, Utility, inputs, outputs, uidescription, message, metaname, metaweight) VALUES ('frame_proc_filt','kkozlov','frame_proc_filt.R',1,1,1,'csv','csv,pdf','5;
 Lowgreen;double;0;
 Highgreen;double;255;
 Lowred;double;0;

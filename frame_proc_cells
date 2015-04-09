@@ -2,7 +2,7 @@
 # This script is a splitted 3 step from frame-proc - stats per cell
 rem <- function(...) invisible(T)
 rem( '
-Rscript.exe "%~F0" "%1" "%2" "%3" "%4" "%~F5" "%~F6"
+Rscript.exe "%~F0" "%1" "%2" "%3" "%4" "%4" "%5" "%~F6" "%~F7"
 EXIT /B
 rem ')
 ### above=BAT, below=R
@@ -36,9 +36,12 @@ aggr_func_hist <- function(cell, datatab, datacolmn) {
 	return(result)
 }
 
-aggr_func_hist_size <- function(cell, datatab, datacolmn, sizebreaks) {
+aggr_func_hist_size <- function(cell, datatab, datacolmn, sizebreaks, sizestep) {
 	my_data = na.omit(datacolmn[datatab$cell == cell])
-	hist_size <- hist(my_data, plot = F, breaks=sizebreaks)
+	br <- seq(from=0, by=sizestep, length.out = sizebreaks + 1)
+	clip_u <- max(br)
+	my_data[my_data > clip_u] <- clip_u
+	hist_size <- hist(my_data, plot = F, breaks = br)
 	result <- hist_size$counts
 	return(result)
 }
@@ -60,6 +63,9 @@ option_list <- list(
 	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
 	help="Print extra output [default=false]"),
 	make_option(c("-b", "--sizebreaks"), type="integer", default=4,
+	help="number of bars in hist [default %default]",
+	metavar="number"),
+	make_option(c("-r", "--sizestep"), type="double", default=200.0,
 	help="number of bars in hist [default %default]",
 	metavar="number"),
 	make_option(c("-m", "--time"), type="character", default="",
@@ -126,9 +132,24 @@ tt <- data.frame(t(coloc_evol_counts))
 colnames(tt) <- sapply(seq(1:10), FUN=function(i) paste0("evol_counts",i))
 restab <- cbind(restab,tt)
 
-size_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area, sizebreaks=opts$sizebreaks)
-tt <- data.frame(t(size_counts))
-colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_counts",i))
+size_obj_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_obj, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
+tt <- data.frame(t(size_obj_counts))
+colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_obj_counts",i))
+restab <- cbind(restab,tt)
+
+size_red_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_red, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
+tt <- data.frame(t(size_red_counts))
+colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_red_counts",i))
+restab <- cbind(restab,tt)
+
+size_green_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_green, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
+tt <- data.frame(t(size_green_counts))
+colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_green_counts",i))
+restab <- cbind(restab,tt)
+
+size_overlap_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_overlap, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
+tt <- data.frame(t(size_overlap_counts))
+colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_overlap_counts",i))
 restab <- cbind(restab,tt)
 
 write.csv(file=outfile, restab, row.names=F)

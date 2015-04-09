@@ -135,6 +135,32 @@ legend("topright", c("green(red>0)", "red(green>0)"), pch = c(15, 17), border = 
 plot(expres$time,expres$mco,main="Number of pixels",xlab="Time",ylab="Ratio overlap/mask per cell", pch=15, type = 'o')
 plot(expres$time,expres$nco,main="Median intensity green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o')
 plot(expres$time,expres$cco,main="Number of pixels in mask green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o')
+# cat("Sizes\n");
+namesarg <- expres$time
+colsdata <- grep("^size_obj", colnames(expres))
+kounts <- expres[, colsdata]
+rwm <- rowSums(kounts)
+kounts <- kounts/rwm
+barplot(main="Sizes obj", names.arg=namesarg, t(kounts),beside=T)
+expres[, colsdata] <- kounts
+colsdata <- grep("^size_red", colnames(expres))
+kounts <- expres[, colsdata]
+rwm <- rowSums(kounts)
+kounts <- kounts/rwm
+barplot(main="Sizes red", names.arg=namesarg, t(kounts),beside=T)
+expres[, colsdata] <- kounts
+colsdata <- grep("^size_green", colnames(expres))
+kounts <- expres[, colsdata]
+rwm <- rowSums(kounts)
+kounts <- kounts/rwm
+barplot(main="Sizes green", names.arg=namesarg, t(kounts),beside=T)
+expres[, colsdata] <- kounts
+colsdata <- grep("^size_overlap", colnames(expres))
+kounts <- expres[, colsdata]
+rwm <- rowSums(kounts)
+kounts <- kounts/rwm
+barplot(main="Sizes overlap", names.arg=namesarg, t(kounts),beside=T)
+expres[, colsdata] <- kounts
 # cat("EGFR\n");
 namesarg <- expres$time
 kounts <- cbind(expres$red_counts1, expres$red_counts2, expres$red_counts3, expres$red_counts4, expres$red_counts5, expres$red_counts6, expres$red_counts7, expres$red_counts8, expres$red_counts9, expres$red_counts10)
@@ -179,34 +205,34 @@ nc <- colnames(counts)
 ntimes <- length(nc)
 
 for (i in 1:ntimes) {
-	barplot(main=nc[i], names.arg=c("overlap/red", "overlap/green", "overlap/obj", "red/obj", "green/obj"), cbind(counts[7:16,i], counts[17:26,i], counts[27:36,i], counts[37:46,i], counts[47:56,i]), beside=T)
+	barplot(main=nc[i], names.arg=c("overlap/red", "overlap/green", "overlap/obj", "red/obj", "green/obj"), cbind(counts[9:18,i], counts[19:28,i], counts[29:38,i], counts[39:48,i], counts[49:58,i]), beside=T, ylim=c(0, 1))
 }
 
 counts2 <- counts
-counts2[8,] <- counts[8,] + counts[9,] + counts[10,] + counts[11,]
-counts2[9,] <- counts[12,] + counts[13,] + counts[14,] + counts[15,]
-counts2[10,] <- counts[16,]
-counts2[11,] <- counts[17,]
-counts2[12,] <- counts[18,] + counts[19,] + counts[20,] + counts[21,]
-counts2[13,] <- counts[22,] + counts[23,] + counts[24,] + counts[25,]
-counts2[14,] <- counts[26,]
-counts2[15,] <- counts[27,]
-counts2[16,] <- counts[28,] + counts[29,] + counts[30,] + counts[31,]
-counts2[17,] <- counts[32,] + counts[33,] + counts[34,] + counts[35,]
-counts2[18,] <- counts[36,]
-counts2[19,] <- counts[37,]
-counts2[20,] <- counts[38,] + counts[39,] + counts[40,] + counts[41,]
-counts2[21,] <- counts[42,] + counts[43,] + counts[44,] + counts[45,]
-counts2[22,] <- counts[46,]
-counts2[23,] <- counts[47,]
-counts2[24,] <- counts[48,] + counts[49,] + counts[50,] + counts[51,]
-counts2[25,] <- counts[52,] + counts[53,] + counts[54,] + counts[55,]
-counts2[26,] <- counts[56,]
+counts2[10,] <- counts[10,] + counts[11,] + counts[12,] + counts[13,]
+counts2[11,] <- counts[14,] + counts[15,] + counts[16,] + counts[17,]
+counts2[12,] <- counts[18,]
+counts2[13,] <- counts[19,]
+counts2[14,] <- counts[20,] + counts[21,] + counts[22,] + counts[23,]
+counts2[15,] <- counts[24,] + counts[25,] + counts[26,] + counts[27,]
+counts2[16,] <- counts[28,]
+counts2[17,] <- counts[29,]
+counts2[18,] <- counts[30,] + counts[31,] + counts[32,] + counts[33,]
+counts2[19,] <- counts[34,] + counts[35,] + counts[36,] + counts[37,]
+counts2[20,] <- counts[38,]
+counts2[21,] <- counts[39,]
+counts2[22,] <- counts[40,] + counts[41,] + counts[42,] + counts[43,]
+counts2[23,] <- counts[44,] + counts[45,] + counts[46,] + counts[47,]
+counts2[24,] <- counts[48,]
+counts2[25,] <- counts[49,]
+counts2[26,] <- counts[50,] + counts[51,] + counts[52,] + counts[53,]
+counts2[27,] <- counts[54,] + counts[55,] + counts[56,] + counts[57,]
+counts2[28,] <- counts[58,]
 
-counts2 <- counts2[1:26,]
+counts2 <- counts2[1:28,]
 
 for (i in 1:ntimes) {
-	barplot(main=nc[i], names.arg=c("overlap/red", "overlap/green", "overlap/obj", "red/obj", "green/obj"), cbind(counts2[7:10,i], counts2[11:14,i], counts2[15:18,i], counts2[19:22,i], counts2[23:26,i]), beside=T)
+	barplot(main=nc[i], names.arg=c("overlap/red", "overlap/green", "overlap/obj", "red/obj", "green/obj"), cbind(counts2[9:12,i], counts2[13:16,i], counts2[17:20,i], counts2[21:24,i], counts2[25:28,i]), beside=T, ylim=c(0, 1))
 }
 #cat("SUCCESS\n");
 res <- dev.off()
