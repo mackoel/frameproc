@@ -2,7 +2,7 @@
 # This script is a splitted 3 step from frame-proc - stats per cell
 rem <- function(...) invisible(T)
 rem( '
-Rscript.exe "%~F0" "%1" "%2" "%3" "%4" "%4" "%5" "%~F6" "%~F7"
+Rscript.exe "%~F0" "%1" "%2" "%3" "%4" "%5" "%6" "%~F7" "%~F8"
 EXIT /B
 rem ')
 ### above=BAT, below=R
