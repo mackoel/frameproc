@@ -28,6 +28,11 @@ aggr_func_cco <- function(cell, datatab) {
 	return(result)
 }
 
+aggr_func_nuc <- function(cell, datatab) {
+	result <- sum(datatab$cell == cell)
+	return(result)
+}
+
 aggr_func_hist <- function(cell, datatab, datacolmn) {
 	my_data = na.omit(datacolmn[datatab$cell == cell])
 	my_data <- my_data[(0 <= my_data) & (my_data <= 1)]
@@ -155,5 +160,7 @@ tt <- data.frame(t(size_overlap_counts))
 colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_overlap_counts",i))
 restab <- cbind(restab,tt)
 
+nuc <- sapply(var_k, FUN=aggr_func_nuc, datatab=qdata)
+restab <- cbind(restab, NumObj=nuc)
 write.csv(file=outfile, restab, row.names=F)
 

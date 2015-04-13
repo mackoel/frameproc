@@ -32,14 +32,14 @@ outfile <- outfiles[1]
 outgraph <- outfiles[2]
 cln <- opts$clnumber
 q <- read.csv(infile)
-q <- q[q$cell != clnumber,]
+q <- q[q$cell != cln,]
 var_k <- unique(q$cell)
 OPTIMALK <- length(var_k)
 STARTK <- var_k[1]
 write.csv(q, file = outfile, row.names = F)
 png(filename = basename(outgraph), width = 300, height = 300, units = "px", pointsize = 12)
 colours <- rainbow(OPTIMALK)
-plot(qdata[q$cell == STARTK,]$xmean, 1024 - q[q$cell == STARTK,]$ymean, xlim=c(0,1024), ylim=c(0,1024), type='p', pch=1, col=colours[1], main="Cells", xlab="Column", ylab="Row", asp=1)
+plot(q[q$cell == STARTK,]$xmean, 1024 - q[q$cell == STARTK,]$ymean, xlim=c(0,1024), ylim=c(0,1024), type='p', pch=1, col=colours[1], main="Cells", xlab="Column", ylab="Row", asp=1)
 for (i in 2:OPTIMALK) {
 	lines(q[q$cell == var_k[i],]$xmean, 1024 - q[q$cell == var_k[i],]$ymean, type='p', pch=i, col=colours[i])
 }
