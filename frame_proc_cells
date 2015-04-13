@@ -82,19 +82,22 @@ qdata <- read.csv(infile)
 colnames(qdata) <- sub("eea1", "green", colnames(qdata))
 colnames(qdata) <- sub("egfr", "red", colnames(qdata))
 colnames(qdata) <- sub("cort", "red", colnames(qdata))
-OPTIMALK <- max(qdata$cell)
+var_k <- unique(qdata$cell)
+OPTIMALK <- length(var_k)
+STARTK <- var_k[1]
 cat(infile, "OPTIMALK", OPTIMALK, "\n");
-dco <- sapply(seq(1:OPTIMALK), FUN=aggr_func_dco, datatab=qdata)
-mco <- sapply(seq(1:OPTIMALK), FUN=aggr_func_mco, datatab=qdata)
-nco <- sapply(seq(1:OPTIMALK), FUN=aggr_func_nco, datatab=qdata)
-cco <- sapply(seq(1:OPTIMALK), FUN=aggr_func_cco, datatab=qdata)
-manders1 <- sapply(seq(1:OPTIMALK), FUN=aggr_func_manders, datatab=qdata, channel=1)
-manders2 <- sapply(seq(1:OPTIMALK), FUN=aggr_func_manders, datatab=qdata, channel=2)
-coloc_red_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_red)
-coloc_green_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_green)
-coloc_vol_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_vol)
-coloc_cvol_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_cvol)
-coloc_evol_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_evol)
+cat(infile, "VAR K", var_k, "\n");
+dco <- sapply(var_k, FUN=aggr_func_dco, datatab=qdata)
+mco <- sapply(var_k, FUN=aggr_func_mco, datatab=qdata)
+nco <- sapply(var_k, FUN=aggr_func_nco, datatab=qdata)
+cco <- sapply(var_k, FUN=aggr_func_cco, datatab=qdata)
+manders1 <- sapply(var_k, FUN=aggr_func_manders, datatab=qdata, channel=1)
+manders2 <- sapply(var_k, FUN=aggr_func_manders, datatab=qdata, channel=2)
+coloc_red_counts <- sapply(var_k, FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_red)
+coloc_green_counts <- sapply(var_k, FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_green)
+coloc_vol_counts <- sapply(var_k, FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_vol)
+coloc_cvol_counts <- sapply(var_k, FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_cvol)
+coloc_evol_counts <- sapply(var_k, FUN=aggr_func_hist, datatab=qdata, datacolmn=qdata$coloc_evol)
 if (opts$time == "CC") {
 	T <- -1
 } else {
@@ -103,7 +106,7 @@ if (opts$time == "CC") {
 
 restab <- data.frame(
 	time=rep(T, OPTIMALK),
-	cell=seq(1:OPTIMALK),
+	cell=var_k,
 	dco=dco,
 	mco=mco,
 	nco=nco,
@@ -132,22 +135,22 @@ tt <- data.frame(t(coloc_evol_counts))
 colnames(tt) <- sapply(seq(1:10), FUN=function(i) paste0("evol_counts",i))
 restab <- cbind(restab,tt)
 
-size_obj_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_obj, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
+size_obj_counts <- sapply(var_k, FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_obj, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
 tt <- data.frame(t(size_obj_counts))
 colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_obj_counts",i))
 restab <- cbind(restab,tt)
 
-size_red_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_red, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
+size_red_counts <- sapply(var_k, FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_red, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
 tt <- data.frame(t(size_red_counts))
 colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_red_counts",i))
 restab <- cbind(restab,tt)
 
-size_green_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_green, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
+size_green_counts <- sapply(var_k, FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_green, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
 tt <- data.frame(t(size_green_counts))
 colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_green_counts",i))
 restab <- cbind(restab,tt)
 
-size_overlap_counts <- sapply(seq(1:OPTIMALK), FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_overlap, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
+size_overlap_counts <- sapply(var_k, FUN=aggr_func_hist_size, datatab=qdata, datacolmn=qdata$real_area_overlap, sizebreaks=opts$sizebreaks, sizestep=opts$sizestep)
 tt <- data.frame(t(size_overlap_counts))
 colnames(tt) <- sapply(seq(1:opts$sizebreaks), FUN=function(i) paste0("size_overlap_counts",i))
 restab <- cbind(restab,tt)

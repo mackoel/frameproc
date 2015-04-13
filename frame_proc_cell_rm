@@ -1,0 +1,47 @@
+#!/usr/bin/Rscript --silent
+rem <- function(...) invisible(T)
+rem( '
+set opt0="%~F0"
+set opt1="%1"
+set opt2="%2"
+set opt3="%3"
+shift
+shift
+shift
+shift
+Rscript.exe "%~F0" "%1" "%2" "%~F3" "%~F4","%~F5"
+EXIT /B
+rem ')
+### above=BAT, below=R
+library(optparse)
+
+option_list <- list(
+	make_option(c("-n", "--clnumber"), type="integer", default=0,
+	help="cell to remove, 0 - don't remove [default %default]",
+	metavar="number"),
+	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
+	help="Print extra output [default=false]")
+)
+opt_parser <- OptionParser(usage = "usage: %prog [options]", option_list = option_list, description = "Post-proc object table", epilogue = "Send feedback to mackoel@gmail.com")
+flaggs <- parse_args(opt_parser, args = commandArgs(trailingOnly = TRUE), print_help_and_exit = TRUE, positional_arguments = TRUE)
+opts <- flaggs$options
+args <- flaggs$args
+infile <- args[1]
+outfiles <- unlist(strsplit(args[2], ",", fixed = TRUE))
+outfile <- outfiles[1]
+outgraph <- outfiles[2]
+cln <- opts$clnumber
+q <- read.csv(infile)
+q <- q[q$cell != clnumber,]
+var_k <- unique(q$cell)
+OPTIMALK <- length(var_k)
+STARTK <- var_k[1]
+write.csv(q, file = outfile, row.names = F)
+png(filename = basename(outgraph), width = 300, height = 300, units = "px", pointsize = 12)
+colours <- rainbow(OPTIMALK)
+plot(qdata[q$cell == STARTK,]$xmean, 1024 - q[q$cell == STARTK,]$ymean, xlim=c(0,1024), ylim=c(0,1024), type='p', pch=1, col=colours[1], main="Cells", xlab="Column", ylab="Row", asp=1)
+for (i in 2:OPTIMALK) {
+	lines(q[q$cell == var_k[i],]$xmean, 1024 - q[q$cell == var_k[i],]$ymean, type='p', pch=i, col=colours[i])
+}
+res <- dev.off()
+
