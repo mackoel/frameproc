@@ -33,6 +33,11 @@ aggr_func_nuc <- function(cell, datatab) {
 	return(result)
 }
 
+aggr_func_sum <- function(cell, datatab, datacolmn) {
+	result <- sum(datacolmn[datatab$cell == cell])
+	return(result)
+}
+
 aggr_func_hist <- function(cell, datatab, datacolmn) {
 	my_data = na.omit(datacolmn[datatab$cell == cell])
 	my_data <- my_data[(0 <= my_data) & (my_data <= 1)]
@@ -162,5 +167,24 @@ restab <- cbind(restab,tt)
 
 nuc <- sapply(var_k, FUN=aggr_func_nuc, datatab=qdata)
 restab <- cbind(restab, NumObj=nuc)
+
+nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$red_mean)
+restab <- cbind(restab, RedMean=nuc)
+
+nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$green_mean)
+restab <- cbind(restab, GreenMean=nuc)
+
+nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$m000)
+restab <- cbind(restab, AreaPix=nuc)
+
+nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$overlap_mask_notempty)
+restab <- cbind(restab, OverlapPix=nuc)
+
+nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$red_mask_notempty)
+restab <- cbind(restab, RedPix=nuc)
+
+nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$green_mask_notempty)
+restab <- cbind(restab, GreenPix=nuc)
+
 write.csv(file=outfile, restab, row.names=F)
 

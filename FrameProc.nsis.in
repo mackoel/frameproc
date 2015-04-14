@@ -39,6 +39,7 @@ Section "FrameProc"
   File /oname=frame_proc_filt.bat "./frame_proc_filt"
   File /oname=frame_proc_obj.bat "./frame_proc_obj"
   File /oname=series_proc_summary.bat "./series_proc_summary"
+  File /oname=frame_proc_cell_rm.bat "./frame_proc_cell_rm"
 
   ReadEnvStr $0 COMSPEC
   SetOutPath "$INSTDIR"

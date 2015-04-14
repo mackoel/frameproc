@@ -40,7 +40,7 @@ outfilecsv <- outfiles[1]
 filenm <- outfiles[2]
 qdata <- read.csv(infile)
 wdata <- qdata[,c("xmean", "ymean")]
-cl <- cluster_cells_k(wdata, opts$optimalk, opt$algo)
+cl <- cluster_cells_k(wdata, opts$optimalk, opts$algo)
 qdata <- cbind(qdata, cell=cl$cluster)
 png(filename = basename(filenm), width = 300, height = 300, units = "px", pointsize = 12)
 colours <- rainbow(opts$optimalk)

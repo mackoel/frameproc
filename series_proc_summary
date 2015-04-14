@@ -98,44 +98,54 @@ templateDialog <- function(title, question, entryNum = 1, entryInit = "1", entry
 }
 
 args = commandArgs(trailingOnly = TRUE)
+verbose <- 0
 
 ReturnVal <- selectDialog("Select input directory and the number of conditions", "Enter number of conditions", "1")
-
-#if (ReturnVal == "ID_CANCEL") return()
-#tkmessageBox(title = "Greeting", message = paste("Hello, ", ReturnVal$N, " and ", ReturnVal$D, sep = ""))
-
 mydir <- ReturnVal$D
 number_of_conditions <- ReturnVal$N
-
 ReturnVal <- templateDialog("Enter templates", "Condition", number_of_conditions, "1")
 
 outfiles <- unlist(strsplit(args[1], ",", fixed=TRUE))
 outfile <- outfiles[1]
 outgraph <- basename(outfiles[2])
 
-#string_tmpls <- unlist(strsplit(tmpls,",",-1))
 string_tmpls <- ReturnVal
+
 fds <- do.call("c", lapply(string_tmpls, function(st) list.files(path = mydir, pattern = st, all.files = FALSE, full.names = TRUE, recursive = FALSE, ignore.case = FALSE, include.dirs = FALSE)))
 datatab <- do.call("rbind", lapply(fds, function(fd) read.csv(fd)))
-expres <- aggregate(x=datatab[-1], by=datatab[1], FUN=mean)
-expres_sd <- aggregate(x=datatab[-1], by=datatab[1], FUN=sd)
+expres <- aggregate(x=datatab[-1], by=datatab[1], FUN=mean, na.rm=TRUE)
+expres_sd <- aggregate(x=datatab[-1], by=datatab[1], FUN=sd, na.rm=TRUE)
 colnames(expres_sd) <- paste0(colnames(expres), ".sd")
-# write summary table
+
+if (verbose == 1) { cat("write summary table\n"); }
 write.csv(file=outfile, cbind(expres, expres_sd), row.names=F)
+
 # create summary graphs
 pdf(file = outgraph)
-# Manders coeffs
-plot(expres$time,expres$dco,main="Mean intensity green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o')
-minman = min(c(expres$manders1, expres$manders2))
-maxman = max(c(expres$manders1, expres$manders2))
+if (verbose == 1) { cat("Corr\n"); }
+minman = min(expres$dco, na.rm = TRUE)
+maxman = max(expres$dco, na.rm = TRUE)
+plot(expres$time,expres$dco,main="Mean intensity green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o', ylim = c(minman, maxman))
+
+if (verbose == 1) { cat("Manders coeffs\n"); }
+minman = min(c(expres$manders1, expres$manders2), na.rm = TRUE)
+maxman = max(c(expres$manders1, expres$manders2), na.rm = TRUE)
 plot(expres$time,expres$manders1,main="Mean Manders coeffs",xlab="Time",ylab="Mean Coeff", pch=15, type = 'o', ylim = c(minman, maxman))
 lines(expres$time,expres$manders2,main="Mean Manders coeffs",xlab="Time",ylab="Mean Coeff", pch=17, type = 'o')
 legend("topright", c("green(red>0)", "red(green>0)"), pch = c(15, 17), border = NA)
-# Correlations
-plot(expres$time,expres$mco,main="Number of pixels",xlab="Time",ylab="Ratio overlap/mask per cell", pch=15, type = 'o')
-plot(expres$time,expres$nco,main="Median intensity green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o')
-plot(expres$time,expres$cco,main="Number of pixels in mask green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o')
-# cat("Sizes\n");
+
+if (verbose == 1) { cat("Correlations\n"); }
+minman = min(expres$mco, na.rm = TRUE)
+maxman = max(expres$mco, na.rm = TRUE)
+plot(expres$time,expres$mco,main="Number of pixels",xlab="Time",ylab="Ratio overlap/mask per cell", pch=15, type = 'o', ylim = c(minman, maxman))
+minman = min(expres$nco, na.rm = TRUE)
+maxman = max(expres$nco, na.rm = TRUE)
+plot(expres$time,expres$nco,main="Median intensity green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o', ylim = c(minman, maxman))
+minman = min(expres$cco, na.rm = TRUE)
+maxman = max(expres$cco, na.rm = TRUE)
+plot(expres$time,expres$cco,main="Number of pixels in mask green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o', ylim = c(minman, maxman))
+
+if (verbose == 1) { cat("Sizes\n"); }
 namesarg <- expres$time
 colsdata <- grep("^size_obj", colnames(expres))
 kounts <- expres[, colsdata]
@@ -229,7 +239,7 @@ counts2[26,] <- counts[50,] + counts[51,] + counts[52,] + counts[53,]
 counts2[27,] <- counts[54,] + counts[55,] + counts[56,] + counts[57,]
 counts2[28,] <- counts[58,]
 
-counts2 <- counts2[1:28,]
+counts2 <- counts2[1:28, , drop = F]
 
 for (i in 1:ntimes) {
 	barplot(main=nc[i], names.arg=c("overlap/red", "overlap/green", "overlap/obj", "red/obj", "green/obj"), cbind(counts2[9:12,i], counts2[13:16,i], counts2[17:20,i], counts2[21:24,i], counts2[25:28,i]), beside=T, ylim=c(0, 1))
