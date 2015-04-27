@@ -1,14 +1,6 @@
 #!/usr/bin/Rscript --silent
 rem <- function(...) invisible(T)
 rem( '
-set opt0="%~F0"
-set opt1="%1"
-set opt2="%2"
-set opt3="%3"
-shift
-shift
-shift
-shift
 Rscript.exe "%~F0" "%1" "%2" "%~F3" "%~F4","%~F5"
 EXIT /B
 rem ')

@@ -7,6 +7,13 @@ rem ')
 ### above=BAT, below=R
 require(tcltk)
 
+error.bar <- function(x, y, upper, lower = upper, length = 0.1,...){
+	if (length(x) != length(y) | length(y) !=length(lower) | length(lower) != length(upper)) {
+		stop("vectors must be same length")
+	}
+	arrows(x, y + upper, x, y - lower, angle = 90, code = 3, length=length, ...)
+}
+
 selectDialog <- function(title, question, entryInit, entryWidth = 20,
     returnValOnCancel = "ID_CANCEL") {
     dlg <- tktoplevel()
@@ -30,11 +37,18 @@ selectDialog <- function(title, question, entryInit, entryWidth = 20,
     tkgrid(tklabel(dlg, text = "       "), sticky="snew")
     tkgrid(tklabel(dlg, text = question), textEntryWidget, sticky="snew")
     tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+    glEntryVarTcl <- tclVar(paste("0.95"))
+    glEntryWidget <- tkentry(dlg, width = paste(entryWidth),
+        textvariable = glEntryVarTcl)
+    tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+    tkgrid(tklabel(dlg, text = "Level"), glEntryWidget, sticky="snew")
+    tkgrid(tklabel(dlg, text = "       "), sticky="snew")
 
     ReturnVal <- returnValOnCancel
-
+    gL <- "0.95"
     onOK <- function() {
         ReturnVal <<- tclvalue(textEntryVarTcl)
+        gL <<- tclvalue(glEntryVarTcl)
         tkgrab.release(dlg)
         tkdestroy(dlg)
     }
@@ -52,7 +66,7 @@ selectDialog <- function(title, question, entryInit, entryWidth = 20,
     tkbind(textEntryWidget, "<Return>", onOK)
     tkwait.window(dlg)
 
-    return(list(N=ReturnVal,D=dirName))
+    return(list(N = ReturnVal, D = dirName, gL = as.numeric(gL)))
 }
 
 templateDialog <- function(title, question, entryNum = 1, entryInit = "1", entryWidth = 80,
@@ -103,6 +117,7 @@ verbose <- 0
 ReturnVal <- selectDialog("Select input directory and the number of conditions", "Enter number of conditions", "1")
 mydir <- ReturnVal$D
 number_of_conditions <- ReturnVal$N
+gammaLevel <- ReturnVal$gL
 ReturnVal <- templateDialog("Enter templates", "Condition", number_of_conditions, "1")
 
 outfiles <- unlist(strsplit(args[1], ",", fixed=TRUE))
@@ -116,7 +131,8 @@ datatab <- do.call("rbind", lapply(fds, function(fd) read.csv(fd)))
 expres <- aggregate(x=datatab[-1], by=datatab[1], FUN=mean, na.rm=TRUE)
 expres_sd <- aggregate(x=datatab[-1], by=datatab[1], FUN=sd, na.rm=TRUE)
 colnames(expres_sd) <- paste0(colnames(expres), ".sd")
-
+nSamples <- aggregate(x=datatab[1], by=datatab[1], FUN=function(x) {return(length(unlist(x)))})
+expres <- cbind(expres, nSamples=as.numeric(nSamples[, 2, drop = TRUE]))
 if (verbose == 1) { cat("write summary table\n"); }
 write.csv(file=outfile, cbind(expres, expres_sd), row.names=F)
 
@@ -126,24 +142,30 @@ if (verbose == 1) { cat("Corr\n"); }
 minman = min(expres$dco, na.rm = TRUE)
 maxman = max(expres$dco, na.rm = TRUE)
 plot(expres$time,expres$dco,main="Mean intensity green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$dco, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$dco.sd / sqrt(expres$nSamples))
 
 if (verbose == 1) { cat("Manders coeffs\n"); }
 minman = min(c(expres$manders1, expres$manders2), na.rm = TRUE)
 maxman = max(c(expres$manders1, expres$manders2), na.rm = TRUE)
-plot(expres$time,expres$manders1,main="Mean Manders coeffs",xlab="Time",ylab="Mean Coeff", pch=15, type = 'o', ylim = c(minman, maxman))
+plot(expres$time, expres$manders1, main="Mean Manders coeffs",xlab="Time",ylab="Mean Coeff", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$manders1, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders1.sd / sqrt(expres$nSamples))
 lines(expres$time,expres$manders2,main="Mean Manders coeffs",xlab="Time",ylab="Mean Coeff", pch=17, type = 'o')
+error.bar(expres$time, expres$manders2, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders2.sd / sqrt(expres$nSamples))
 legend("topright", c("green(red>0)", "red(green>0)"), pch = c(15, 17), border = NA)
 
 if (verbose == 1) { cat("Correlations\n"); }
 minman = min(expres$mco, na.rm = TRUE)
 maxman = max(expres$mco, na.rm = TRUE)
 plot(expres$time,expres$mco,main="Number of pixels",xlab="Time",ylab="Ratio overlap/mask per cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$mco, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$mco.sd / sqrt(expres$nSamples))
 minman = min(expres$nco, na.rm = TRUE)
 maxman = max(expres$nco, na.rm = TRUE)
 plot(expres$time,expres$nco,main="Median intensity green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$nco, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$nco.sd / sqrt(expres$nSamples))
 minman = min(expres$cco, na.rm = TRUE)
 maxman = max(expres$cco, na.rm = TRUE)
 plot(expres$time,expres$cco,main="Number of pixels in mask green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$cco, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$cco.sd / sqrt(expres$nSamples))
 
 if (verbose == 1) { cat("Sizes\n"); }
 namesarg <- expres$time
@@ -151,56 +173,70 @@ colsdata <- grep("^size_obj", colnames(expres))
 kounts <- expres[, colsdata]
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Sizes obj", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Sizes obj", names.arg=namesarg, t(kounts), beside=T)
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[, colsdata] <- kounts
 colsdata <- grep("^size_red", colnames(expres))
 kounts <- expres[, colsdata]
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Sizes red", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Sizes red", names.arg=namesarg, t(kounts),beside=T)
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[, colsdata] <- kounts
 colsdata <- grep("^size_green", colnames(expres))
 kounts <- expres[, colsdata]
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Sizes green", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Sizes green", names.arg=namesarg, t(kounts),beside=T)
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[, colsdata] <- kounts
 colsdata <- grep("^size_overlap", colnames(expres))
 kounts <- expres[, colsdata]
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Sizes overlap", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Sizes overlap", names.arg=namesarg, t(kounts),beside=T)
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[, colsdata] <- kounts
 # cat("EGFR\n");
 namesarg <- expres$time
 kounts <- cbind(expres$red_counts1, expres$red_counts2, expres$red_counts3, expres$red_counts4, expres$red_counts5, expres$red_counts6, expres$red_counts7, expres$red_counts8, expres$red_counts9, expres$red_counts10)
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Ratio overlap/red", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Ratio overlap/red", names.arg=namesarg, t(kounts),beside=T)
+colsdata <- grep("^red_counts", colnames(expres))
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[,c("red_counts1", "red_counts2", "red_counts3", "red_counts4", "red_counts5", "red_counts6", "red_counts7", "red_counts8", "red_counts9", "red_counts10")] <- kounts
 # cat("EEA1\n");
 kounts <- cbind(expres$green_counts1, expres$green_counts2, expres$green_counts3, expres$green_counts4, expres$green_counts5, expres$green_counts6, expres$green_counts7, expres$green_counts8, expres$green_counts9, expres$green_counts10)
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Ratio overlap/green", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Ratio overlap/green", names.arg=namesarg, t(kounts),beside=T)
+colsdata <- grep("^green_counts", colnames(expres))
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[,c("green_counts1", "green_counts2", "green_counts3", "green_counts4", "green_counts5", "green_counts6", "green_counts7", "green_counts8", "green_counts9", "green_counts10")] <- kounts
 # cat("VOL\n");
 kounts <- cbind(expres$vol_counts1, expres$vol_counts2, expres$vol_counts3, expres$vol_counts4, expres$vol_counts5, expres$vol_counts6, expres$vol_counts7, expres$vol_counts8, expres$vol_counts9, expres$vol_counts10)
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Ratio overlap/obj", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Ratio overlap/obj", names.arg=namesarg, t(kounts),beside=T)
+colsdata <- grep("^vol_counts", colnames(expres))
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[,c("vol_counts1", "vol_counts2", "vol_counts3", "vol_counts4", "vol_counts5", "vol_counts6", "vol_counts7", "vol_counts8", "vol_counts9", "vol_counts10")] <- kounts
 # cat("CVOL\n");
 kounts <- cbind(expres$cvol_counts1, expres$cvol_counts2, expres$cvol_counts3, expres$cvol_counts4, expres$cvol_counts5, expres$cvol_counts6, expres$cvol_counts7, expres$cvol_counts8, expres$cvol_counts9, expres$cvol_counts10)
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Ratio red/obj", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Ratio red/obj", names.arg=namesarg, t(kounts),beside=T)
+colsdata <- grep("^cvol_counts", colnames(expres))
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[,c("cvol_counts1", "cvol_counts2", "cvol_counts3", "cvol_counts4", "cvol_counts5", "cvol_counts6", "cvol_counts7", "cvol_counts8", "cvol_counts9", "cvol_counts10")] <- kounts
 # cat("EVOL\n");
 kounts <- cbind(expres$evol_counts1, expres$evol_counts2, expres$evol_counts3, expres$evol_counts4, expres$evol_counts5, expres$evol_counts6, expres$evol_counts7, expres$evol_counts8, expres$evol_counts9, expres$evol_counts10)
 rwm <- rowSums(kounts)
 kounts <- kounts/rwm
-barplot(main="Ratio green/obj", names.arg=namesarg, t(kounts),beside=T)
+brpt <- barplot(main="Ratio green/obj", names.arg=namesarg, t(kounts),beside=T)
+colsdata <- grep("^evol_counts", colnames(expres))
+error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
 expres[,c("evol_counts1", "evol_counts2", "evol_counts3", "evol_counts4", "evol_counts5", "evol_counts6", "evol_counts7", "evol_counts8", "evol_counts9", "evol_counts10")] <- kounts
 
 barplot(main="Ratio overlap/red", names.arg=namesarg, t(cbind(expres$red_counts1, expres$red_counts2+expres$red_counts3+expres$red_counts4+ expres$red_counts5, expres$red_counts6+expres$red_counts7+expres$red_counts8+expres$red_counts9, expres$red_counts10)),beside=T)
