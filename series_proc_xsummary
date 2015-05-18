@@ -1,0 +1,326 @@
+#!/usr/bin/Rscript --silent
+rem <- function(...) invisible(T)
+rem( '
+Rscript.exe "%~F0" "%~F1","%~F2"
+EXIT /B
+rem ')
+### above=BAT, below=R
+require(tcltk)
+
+error.bar <- function(x, y, upper, lower = upper, length = 0.1,...){
+	if (length(x) != length(y) | length(y) !=length(lower) | length(lower) != length(upper)) {
+		stop("vectors must be same length")
+	}
+	arrows(x, y + upper, x, y - lower, angle = 90, code = 3, length=length, ...)
+}
+
+hist.bars <- function(expres, expres_sd, colsdata, namesarg, gammaLevel, tmain = "Title"){
+	kounts <- expres[, colsdata]
+	rwm <- rowSums(kounts)
+	kounts <- kounts/rwm
+	brpt <- barplot(main = tmain, names.arg = namesarg, t(kounts), beside=T)
+	error.bar(brpt, t(kounts), qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * t(expres_sd[, colsdata]) / sqrt(expres$nSamples) / rwm)
+	return(kounts)
+}
+
+selectDialog <- function(title, question, entryInit, entryWidth = 20,
+    returnValOnCancel = "ID_CANCEL") {
+    dlg <- tktoplevel()
+    tkwm.deiconify(dlg)
+    tkgrab.set(dlg)
+    tkfocus(dlg)
+    tkwm.title(dlg, title)
+	labelText <- tclVar(" Select ")
+    onD <- function(arg) {
+        dirName <<- tclvalue(tkchooseDirectory())
+        tclvalue(labelText) <- dirName
+    }
+    D.but <- tkbutton(dlg, text = tclvalue(labelText), command = onD)
+    tkconfigure(D.but, textvariable=labelText)
+    tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+    tkgrid(tklabel(dlg, text = "Input directory"), D.but, sticky="snew")
+    tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+    textEntryVarTcl <- tclVar(paste(entryInit))
+    textEntryWidget <- tkentry(dlg, width = paste(entryWidth),
+        textvariable = textEntryVarTcl)
+    tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+    tkgrid(tklabel(dlg, text = question), textEntryWidget, sticky="snew")
+    tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+    glEntryVarTcl <- tclVar(paste("0.95"))
+    glEntryWidget <- tkentry(dlg, width = paste(entryWidth),
+        textvariable = glEntryVarTcl)
+    tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+    tkgrid(tklabel(dlg, text = "Level"), glEntryWidget, sticky="snew")
+    tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+
+    ReturnVal <- returnValOnCancel
+    gL <- "0.95"
+    onOK <- function() {
+        ReturnVal <<- tclvalue(textEntryVarTcl)
+        gL <<- tclvalue(glEntryVarTcl)
+        tkgrab.release(dlg)
+        tkdestroy(dlg)
+    }
+    onCancel <- function() {
+        ReturnVal <<- returnValOnCancel
+        tkgrab.release(dlg)
+        tkdestroy(dlg)
+    }
+    OK.but <- tkbutton(dlg, text = "   OK   ", command = onOK)
+    Cancel.but <- tkbutton(dlg, text = " Cancel ", command = onCancel)
+    tkgrid(OK.but, Cancel.but)
+    tkgrid(tklabel(dlg, text = "    "))
+    tkfocus(dlg)
+	tkbind(dlg, "<Destroy>", function() {tkgrab.release(dlg)})
+    tkbind(textEntryWidget, "<Return>", onOK)
+    tkwait.window(dlg)
+
+    return(list(N = ReturnVal, D = dirName, gL = as.numeric(gL)))
+}
+
+templateDialog <- function(title, question, entryNum = 1, entryInit = "1", entryWidth = 80,
+	returnValOnCancel = "ID_CANCEL") {
+	dlg <- tktoplevel()
+	tkwm.deiconify(dlg)
+	tkgrab.set(dlg)
+	tkfocus(dlg)
+	tkwm.title(dlg, title)
+	etmpls <- vector("list", entryNum)
+	for (i in 1:entryNum) {
+		etmpls[[i]] <- tclVar(paste(entryInit))
+		textEntryWidget <- tkentry(dlg, width = paste(entryWidth),
+			textvariable = etmpls[[i]])
+		tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+		tkgrid(tklabel(dlg, text = paste0(question, " ", i)), textEntryWidget, sticky="snew")
+		tkgrid(tklabel(dlg, text = "       "), sticky="snew")
+	}
+	ReturnVal <- returnValOnCancel
+
+	onOK <- function() {
+		ReturnVal <<- vector("list", entryNum)
+		for (i in 1:entryNum) {
+			ReturnVal[[i]] <<- tclvalue(etmpls[[i]])
+		}
+		tkgrab.release(dlg)
+		tkdestroy(dlg)
+	}
+	onCancel <- function() {
+		ReturnVal <<- returnValOnCancel
+		tkgrab.release(dlg)
+		tkdestroy(dlg)
+	}
+    	OK.but <- tkbutton(dlg, text = "   OK   ", command = onOK)
+    	Cancel.but <- tkbutton(dlg, text = " Cancel ", command = onCancel)
+    	tkgrid(OK.but, Cancel.but)
+    	tkgrid(tklabel(dlg, text = "    "))
+	tkfocus(dlg)
+   	tkbind(dlg, "<Destroy>", function() {tkgrab.release(dlg)})
+	tkbind(textEntryWidget, "<Return>", onOK)
+	tkwait.window(dlg)
+    	return(ReturnVal)
+}
+
+args = commandArgs(trailingOnly = TRUE)
+verbose <- 0
+
+ReturnVal <- selectDialog("Select input directory and the number of conditions", "Enter number of conditions", "1")
+mydir <- ReturnVal$D
+number_of_conditions <- ReturnVal$N
+gammaLevel <- ReturnVal$gL
+ReturnVal <- templateDialog("Enter templates", "Condition", number_of_conditions, "1")
+
+outfiles <- unlist(strsplit(args[1], ",", fixed=TRUE))
+outfile <- outfiles[1]
+outgraph <- basename(outfiles[2])
+
+string_tmpls <- ReturnVal
+
+fds <- do.call("c", lapply(string_tmpls, function(st) list.files(path = mydir, pattern = st, all.files = FALSE, full.names = TRUE, recursive = FALSE, ignore.case = FALSE, include.dirs = FALSE)))
+datatab <- do.call("rbind", lapply(fds, function(fd) read.csv(fd)))
+expres <- aggregate(x=datatab[-1], by=datatab[1], FUN=mean, na.rm=TRUE)
+expres_sd <- aggregate(x=datatab[-1], by=datatab[1], FUN=sd, na.rm=TRUE)
+colnames(expres_sd) <- paste0(colnames(expres), ".sd")
+nSamples <- aggregate(x=datatab[1], by=datatab[1], FUN=function(x) {return(length(unlist(x)))})
+expres <- cbind(expres, nSamples=as.numeric(nSamples[, 2, drop = TRUE]))
+if (verbose == 1) { cat("write summary table\n"); }
+write.csv(file=outfile, cbind(expres, expres_sd), row.names=F)
+#
+# create summary graphs
+#
+pdf(file = outgraph)
+if (verbose == 1) { cat("Corr\n"); }
+#
+# Intensity correlation
+#
+minman = min(c(expres$dco.low,expres$dco.high,expres$dco.full), na.rm = TRUE)
+maxman = max(c(expres$dco.low,expres$dco.high,expres$dco.full), na.rm = TRUE)
+plot(expres$time, expres$dco.low, main = "Mean intensity green vs red", xlab="Time", ylab = "Mean correlation per cell", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$dco.low, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$dco.low.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$dco.high, pch = 17, type = 'o')
+error.bar(expres$time, expres$dco.high, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$dco.high.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$dco.full, pch = 19, type = 'o')
+error.bar(expres$time, expres$dco.full, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$dco.full.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Number of pixels correlation
+#
+minman = min(c(expres$cco.low,expres$cco.high,expres$cco.full), na.rm = TRUE)
+maxman = max(c(expres$cco.low,expres$cco.high,expres$cco.full), na.rm = TRUE)
+plot(expres$time, expres$cco.low, main = "Number of pixels in mask green vs red", xlab="Time", ylab = "Mean correlation per cell", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$cco.low, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$cco.low.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$cco.high, pch = 17, type = 'o')
+error.bar(expres$time, expres$cco.high, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$cco.high.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$cco.full, pch = 19, type = 'o')
+error.bar(expres$time, expres$cco.full, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$cco.full.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Manders coefficients for intensities (green)
+#
+if (verbose == 1) { cat("Manders coeffs int gr\n"); }
+minman = min(c(expres$manders.int.green.low, expres$manders.int.green.high, expres$manders.int.green.full), na.rm = TRUE)
+maxman = max(c(expres$manders.int.green.low, expres$manders.int.green.high, expres$manders.int.green.full), na.rm = TRUE)
+plot(expres$time, expres$manders.int.green.low, main = "Mean Manders coeffs for intensity, green(red>0)", xlab = "Time", ylab = "Mean Coeff", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$manders.int.green.low, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.int.green.low.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$manders.int.green.high, pch = 17, type = 'o')
+error.bar(expres$time, expres$manders.int.green.high, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.int.green.high.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$manders.int.green.full, pch = 19, type = 'o')
+error.bar(expres$time, expres$manders.int.green.full, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.int.green.full.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Manders coefficients for object counts (green)
+#
+if (verbose == 1) { cat("Manders coeffs obj gr\n"); }
+minman = min(c(expres$manders.obj.green.low, expres$manders.obj.green.high, expres$manders.obj.green.full), na.rm = TRUE)
+maxman = max(c(expres$manders.obj.green.low, expres$manders.obj.green.high, expres$manders.obj.green.full), na.rm = TRUE)
+plot(expres$time, expres$manders.obj.green.low, main = "Mean Manders coeffs for object counts, green(red>0)", xlab = "Time", ylab = "Mean Coeff", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$manders.obj.green.low, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.obj.green.low.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$manders.obj.green.high, pch = 17, type = 'o')
+error.bar(expres$time, expres$manders.obj.green.high, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.obj.green.high.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$manders.obj.green.full, pch = 19, type = 'o')
+error.bar(expres$time, expres$manders.obj.green.full, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.obj.green.full.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Manders coefficients for intensities (red)
+#
+if (verbose == 1) { cat("Manders coeffs int red\n"); }
+minman = min(c(expres$manders.int.red.low, expres$manders.int.red.high, expres$manders.int.red.full), na.rm = TRUE)
+maxman = max(c(expres$manders.int.red.low, expres$manders.int.red.high, expres$manders.int.red.full), na.rm = TRUE)
+plot(expres$time, expres$manders.int.red.low, main = "Mean Manders coeffs for intensity, red(green>0)", xlab = "Time", ylab = "Mean Coeff", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$manders.int.red.low, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.int.red.low.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$manders.int.red.high, pch = 17, type = 'o')
+error.bar(expres$time, expres$manders.int.red.high, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.int.red.high.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$manders.int.red.full, pch = 19, type = 'o')
+error.bar(expres$time, expres$manders.int.red.full, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.int.red.full.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Manders coefficients for object counts (red)
+#
+if (verbose == 1) { cat("Manders coeffs obj red\n"); }
+minman = min(c(expres$manders.obj.red.low, expres$manders.obj.red.high, expres$manders.obj.red.full), na.rm = TRUE)
+maxman = max(c(expres$manders.obj.red.low, expres$manders.obj.red.high, expres$manders.obj.red.full), na.rm = TRUE)
+plot(expres$time, expres$manders.obj.red.low, main = "Mean Manders coeffs for object counts, red(green>0)", xlab = "Time", ylab = "Mean Coeff", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$manders.obj.red.low, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.obj.red.low.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$manders.obj.red.high, pch = 17, type = 'o')
+error.bar(expres$time, expres$manders.obj.red.high, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.obj.red.high.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$manders.obj.red.full, pch = 19, type = 'o')
+error.bar(expres$time, expres$manders.obj.red.full, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$manders.obj.red.full.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Number of objects
+#
+if (verbose == 1) { cat("Number of obj\n"); }
+minman = min(expres$NumObj, na.rm = TRUE)
+maxman = max(expres$NumObj, na.rm = TRUE)
+plot(expres$time, expres$NumObj, main = "Number of objects (all)", xlab = "Time", ylab = "Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$NumObj, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$NumObj.sd / sqrt(expres$nSamples))
+#
+# Red
+#
+minman = min(expres$NumRedObj, na.rm = TRUE)
+maxman = max(expres$NumRedObj, na.rm = TRUE)
+plot(expres$time, expres$NumObj, main = "Number of objects (red)", xlab = "Time", ylab = "Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$NumRedObj, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$NumRedObj.sd / sqrt(expres$nSamples))
+#
+# Green
+#
+minman = min(c(expres$NumGreenObjLow, expres$NumGreenObjHigh, expres$NumGreenObjFull), na.rm = TRUE)
+maxman = max(c(expres$NumGreenObjLow, expres$NumGreenObjHigh, expres$NumGreenObjFull), na.rm = TRUE)
+plot(expres$time, expres$NumGreenObjLow, main = "Number of objects (green)", xlab = "Time", ylab = "Per Cell", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$NumGreenObjLow, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$NumGreenObjLow.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$NumGreenObjHigh, pch = 17, type = 'o')
+error.bar(expres$time, expres$NumGreenObjHigh, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$NumGreenObjHigh.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$NumGreenObjFull, pch = 19, type = 'o')
+error.bar(expres$time, expres$NumGreenObjFull, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$NumGreenObjFull.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Cumulative intensities
+#
+minman = min(expres$RedMean, na.rm = TRUE)
+maxman = max(expres$RedMean, na.rm = TRUE)
+plot(expres$time,expres$RedMean, main = "Cumulative Intensity in Red", xlab = "Time", ylab = "Per Cell", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$RedMean, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$RedMean.sd / sqrt(expres$nSamples))
+minman = min(c(expres$GreenMeanLow, expres$GreenMeanHigh, expres$GreenMeanFull), na.rm = TRUE)
+maxman = max(c(expres$GreenMeanLow, expres$GreenMeanHigh, expres$GreenMeanFull), na.rm = TRUE)
+plot(expres$time, expres$GreenMeanLow, main = "Cumulative Intensity in Green", xlab = "Time", ylab = "Per Cell", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$GreenMeanLow, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$GreenMeanLow.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$GreenMeanHigh, pch = 17, type = 'o')
+error.bar(expres$time, expres$GreenMeanHigh, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$GreenMeanHigh.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$GreenMeanFull, pch = 19, type = 'o')
+error.bar(expres$time, expres$GreenMeanFull, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$GreenMeanFull.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Cumulative areas
+#
+minman = min(expres$AreaPix, na.rm = TRUE)
+maxman = max(expres$AreaPix, na.rm = TRUE)
+plot(expres$time,expres$AreaPix,main="Cumulative Area",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$AreaPix, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$AreaPix.sd / sqrt(expres$nSamples))
+minman = min(expres$OverlapPix, na.rm = TRUE)
+maxman = max(expres$OverlapPix, na.rm = TRUE)
+plot(expres$time,expres$OverlapPix,main="Cumulative Area Overlap",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$OverlapPix, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$OverlapPix.sd / sqrt(expres$nSamples))
+minman = min(expres$RedPix, na.rm = TRUE)
+maxman = max(expres$RedPix, na.rm = TRUE)
+plot(expres$time,expres$RedPix,main="Cumulative Area Red",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$RedPix, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$RedPix.sd / sqrt(expres$nSamples))
+minman = min(c(expres$GreenPixLow, expres$GreenPixHigh, expres$GreenPixFull), na.rm = TRUE)
+maxman = max(c(expres$GreenPixLow, expres$GreenPixHigh, expres$GreenPixFull), na.rm = TRUE)
+plot(expres$time, expres$GreenPixLow, main = "Cumulative Area Green", xlab = "Time", ylab = "Per Cell", pch = 15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$GreenPixLow, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$GreenPixLow.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$GreenPixHigh, pch = 17, type = 'o')
+error.bar(expres$time, expres$GreenPixHigh, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$GreenPixHigh.sd / sqrt(expres$nSamples))
+lines(expres$time, expres$GreenPixFull, pch = 19, type = 'o')
+error.bar(expres$time, expres$GreenPixFull, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$GreenPixFull.sd / sqrt(expres$nSamples))
+legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
+#
+# Ratio histograms
+#
+if (verbose == 1) {  cat("Counts\n"); }
+
+tmgr <- data.frame(tmains = c("Ratio overlap/red", "Ratio overlap/green(low)", "Ratio overlap/green(high)", "Ratio overlap/green(full)", "Ratio overlap/obj", "Ratio red/obj", "Ratio green/obj(low)", "Ratio green/obj(high)", "Ratio green/obj(full)"), greps = c("^red_counts", "^low_green_counts", "^high_green_counts", "^full_green_counts", "^vol_counts", "^cvol_counts", "^low_evol_counts", "^high_evol_counts", "^full_evol_counts"), stringsAsFactors=F)
+
+apply(tmgr, 1, FUN = function(arg) {
+				colsdata <- grep(arg[2], colnames(expres))
+				expres[, colsdata] <- hist.bars(expres, expres_sd, colsdata, namesarg, gammaLevel, tmain = arg[1])
+			})
+
+#
+# Object areas
+#
+if (verbose == 1) { cat("Sizes\n"); }
+
+namesarg <- expres$time
+
+tmgr <- data.frame(tmains = c("Sizes obj", "Sizes red", "Sizes low green", "Sizes high green", "Sizes full green", "Sizes overlap"), greps = c("^size_obj", "^size_red", "^size_low_green", "^size_high_green", "^size_full_green", "^size_overlap"), stringsAsFactors=F)
+
+apply(tmgr, 1, FUN = function(arg) {
+				colsdata <- grep(arg[2], colnames(expres))
+				expres[, colsdata] <- hist.bars(expres, expres_sd, colsdata, namesarg, gammaLevel, tmain = arg[1])
+			})
+#
+# Done
+#
+if (verbose == 1) {  cat("SUCCESS\n"); }
+res <- dev.off()
+
+
