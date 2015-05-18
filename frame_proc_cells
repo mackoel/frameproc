@@ -41,8 +41,12 @@ aggr_func_sum <- function(cell, datatab, datacolmn) {
 aggr_func_hist <- function(cell, datatab, datacolmn) {
 	my_data = na.omit(datacolmn[datatab$cell == cell])
 	my_data <- my_data[(0 <= my_data) & (my_data <= 1)]
-	coloc_hist <- hist(my_data, plot = F, breaks=seq(0, 1, by=0.1))
-	result <- coloc_hist$counts
+	if (length(my_data) > 0) {
+		coloc_hist <- hist(my_data, plot = F, breaks=seq(0, 1, by=0.1))
+		result <- coloc_hist$counts
+	} else {
+		result <- rep(0, 10)
+	}
 	return(result)
 }
 
@@ -97,6 +101,9 @@ OPTIMALK <- length(var_k)
 STARTK <- var_k[1]
 cat(infile, "OPTIMALK", OPTIMALK, "\n");
 cat(infile, "VAR K", var_k, "\n");
+if (OPTIMALK == 0) {
+	stop(paste0("No data in ", infile))
+}
 dco <- sapply(var_k, FUN=aggr_func_dco, datatab=qdata)
 mco <- sapply(var_k, FUN=aggr_func_mco, datatab=qdata)
 nco <- sapply(var_k, FUN=aggr_func_nco, datatab=qdata)

@@ -167,6 +167,41 @@ maxman = max(expres$cco, na.rm = TRUE)
 plot(expres$time,expres$cco,main="Number of pixels in mask green vs red",xlab="Time",ylab="Mean correlation per cell", pch=15, type = 'o', ylim = c(minman, maxman))
 error.bar(expres$time, expres$cco, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$cco.sd / sqrt(expres$nSamples))
 
+minman = min(expres$NumObj, na.rm = TRUE)
+maxman = max(expres$NumObj, na.rm = TRUE)
+plot(expres$time,expres$NumObj,main="Number of objects",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$NumObj, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$NumObj.sd / sqrt(expres$nSamples))
+
+minman = min(expres$RedMean, na.rm = TRUE)
+maxman = max(expres$RedMean, na.rm = TRUE)
+plot(expres$time,expres$RedMean,main="Cumulative Intensity in Red",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$RedMean, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$RedMean.sd / sqrt(expres$nSamples))
+
+minman = min(expres$GreenMean, na.rm = TRUE)
+maxman = max(expres$GreenMean, na.rm = TRUE)
+plot(expres$time,expres$GreenMean,main="Cumulative Intensity in Green",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$GreenMean, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$GreenMean.sd / sqrt(expres$nSamples))
+
+minman = min(expres$AreaPix, na.rm = TRUE)
+maxman = max(expres$AreaPix, na.rm = TRUE)
+plot(expres$time,expres$AreaPix,main="Cumulative Area",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$AreaPix, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$AreaPix.sd / sqrt(expres$nSamples))
+
+minman = min(expres$OverlapPix, na.rm = TRUE)
+maxman = max(expres$OverlapPix, na.rm = TRUE)
+plot(expres$time,expres$OverlapPix,main="Cumulative Area Overlap",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$OverlapPix, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$OverlapPix.sd / sqrt(expres$nSamples))
+
+minman = min(expres$RedPix, na.rm = TRUE)
+maxman = max(expres$RedPix, na.rm = TRUE)
+plot(expres$time,expres$RedPix,main="Cumulative Area Red",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$RedPix, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$RedPix.sd / sqrt(expres$nSamples))
+
+minman = min(expres$GreenPix, na.rm = TRUE)
+maxman = max(expres$GreenPix, na.rm = TRUE)
+plot(expres$time,expres$GreenPix,main="Cumulative Area Green",xlab="Time",ylab="Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+error.bar(expres$time, expres$GreenPix, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$GreenPix.sd / sqrt(expres$nSamples))
+
 if (verbose == 1) { cat("Sizes\n"); }
 namesarg <- expres$time
 colsdata <- grep("^size_obj", colnames(expres))
