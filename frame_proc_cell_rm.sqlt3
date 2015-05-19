@@ -1,0 +1,8 @@
+INSERT INTO Operators (name, implementor, executable, type, Misc, Utility, inputs, outputs, uidescription, message, metaname, metaweight) VALUES ('frame_proc_cell_rm','kkozlov','frame_proc_cell_rm',1,1,1,'csv','csv,png','1;
+Number of cluster to remove;integer;0;
+
+-n $1;','Process table to remove one cluster
+INPUT: csv obj table 
+OUTPUT: 
+csv obj table with cell column
+cell picture','frame_proc_cell_rm','0');

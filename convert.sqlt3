@@ -1,0 +1,4 @@
+INSERT INTO Operators (name, implementor, executable, type, Misc, Utility, inputs, outputs, uidescription, message, metaname, metaweight) VALUES ('convert','kkozlov','convert',1,1,1,'tif','tif','1;
+Channel;string;R;
+
+-depth 8 -channel $1 -separate;','','convert','0');

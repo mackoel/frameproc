@@ -1,0 +1,59 @@
+# ProStack scenario
+
+[Workspace]
+n=1
+# This sceanrio computes various statistics.
+#
+# kozlov_kn@spbstu.ru
+#
+#
+#
+#
+Name=Статобработка
+nodes=3
+
+[Node:2]
+info=0;64;267;30;35;0;0;0;0;0;0;0;0;0;
+id=
+type=OUS
+file=file:///storage1/kkozlov/documents/projects/tracking/eea1-cort/work/-xsummary.csv
+server=default
+delay=60
+vip=0
+label=SAVE tab
+
+[default]
+name=default
+host=localhost
+port=7100
+address=/
+proto=door
+login=
+password=
+
+[Node:3]
+info=0;180;296;30;35;0;0;0;0;0;0;0;0;0;
+id=
+type=OUS
+file=file:///storage1/kkozlov/documents/projects/tracking/eea1-cort/work/-xsumgraph.pdf
+server=default
+delay=60
+vip=0
+label=SAVE graph
+
+[Node:4]
+info=0;77;101;30;50;0;0;0;0;0;0;0;0;0;
+id=
+type=PAM
+file=.any,.any
+name=series_proc_xsummary
+version=6.1.3
+use_metaname=0
+server=default
+delay=60000
+vip=0
+label=series_proc_xsummary
+
+[Connections]
+4.1=2.1
+4.2=3.1

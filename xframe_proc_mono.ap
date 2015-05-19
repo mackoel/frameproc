@@ -1,0 +1,85 @@
+# ProStack scenario
+
+[Workspace]
+n=1
+# This sceanrio computes various quantities
+# from tables with quantitative information
+# extracted from mages with single cells.
+#
+# kozlov_kn@spbstu.ru
+#
+#
+#
+#
+Name=Пост-обработка количественной информации
+nodes=5
+
+[Node:0]
+info=0;107;370;30;35;0;0;0;0;0;0;0;0;0;
+id=-m 15 -r 116.0
+type=PAM
+file=.any
+name=frame_proc_obj
+version=6.1.3
+use_metaname=0
+server=default
+delay=60
+vip=1
+label=frame_proc_obj
+
+[default]
+name=default
+host=localhost
+port=7100
+address=/
+proto=door
+login=
+password=
+
+[Connections]
+0.1=10.1;8.1;
+4.1=0.1
+10.1=7.1
+
+[Node:4]
+info=0;125;21;30;35;0;0;0;0;0;0;0;0;0;
+id=
+type=INS
+file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/cort%2012_05_14/max0/-15_merged_counts.csv
+server=default
+delay=60
+vip=0
+label=OPEN counts
+
+[Node:7]
+info=0;215;624;30;35;0;0;0;0;0;0;0;0;0;
+id=
+type=OUS
+file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/cort%2012_05_14/max0/-xpcstat.csv
+server=default
+delay=60
+vip=0
+label=SAVE per cell stat
+
+[Node:8]
+info=0;123;613;30;35;0;0;0;0;0;0;0;0;0;
+id=
+type=OUS
+file=file:///users/kkozlov/storage1/documents/projects/tracking/eea1-cort/cort%2012_05_14/max0/-xobjcounts.csv
+server=default
+delay=60
+vip=0
+label=SAVE obj counts
+
+[Node:10]
+info=0;208;463;30;35;0;0;0;0;0;0;0;0;0;
+id=-o 5 -i 45 -m 15 -b 6 -r 20000
+type=PAM
+file=.any
+name=frame_proc_xcells
+version=6.1.3
+use_metaname=0
+server=default
+delay=60
+vip=0
+label=frame_proc_xcells

@@ -34,11 +34,13 @@ DirText "Please select the installation folder."
 Section "FrameProc"
   SetOutPath "$INSTDIR"
   File /oname=frame_proc_cells.bat "./frame_proc_cells"
+  File /oname=frame_proc_xcells.bat "./frame_proc_xcells"
   File /oname=frame_proc_clust.bat "./frame_proc_clust"
   File /oname=frame_proc_clust_k.bat "./frame_proc_clust_k"
   File /oname=frame_proc_filt.bat "./frame_proc_filt"
   File /oname=frame_proc_obj.bat "./frame_proc_obj"
   File /oname=series_proc_summary.bat "./series_proc_summary"
+  File /oname=series_proc_xsummary.bat "./series_proc_xsummary"
   File /oname=frame_proc_cell_rm.bat "./frame_proc_cell_rm"
 
   ReadEnvStr $0 COMSPEC
