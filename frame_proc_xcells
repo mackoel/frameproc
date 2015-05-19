@@ -28,7 +28,7 @@ aggr_func_cco <- function(cell, datatab) {
 }
 
 aggr_func_nuc <- function(cell, datatab) {
-	result <- sum(datatab$cell == cell)
+	result <- sum((datatab[datatab$cell == cell,]$green_mask_notempty > 0) | (datatab[datatab$cell == cell,]$red_mask_notempty > 0))
 	return(result)
 }
 
