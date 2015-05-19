@@ -238,7 +238,7 @@ error.bar(expres$time, expres$NumObj, qt(0.5 * (gammaLevel + 1), df = expres$nSa
 #
 minman = min(expres$NumRedObj, na.rm = TRUE)
 maxman = max(expres$NumRedObj, na.rm = TRUE)
-plot(expres$time, expres$NumObj, main = "Number of objects (red)", xlab = "Time", ylab = "Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
+plot(expres$time, expres$NumRedObj, main = "Number of objects (red)", xlab = "Time", ylab = "Per Cell", pch=15, type = 'o', ylim = c(minman, maxman))
 error.bar(expres$time, expres$NumRedObj, qt(0.5 * (gammaLevel + 1), df = expres$nSamples - 1 ) * expres_sd$NumRedObj.sd / sqrt(expres$nSamples))
 #
 # Green
@@ -297,6 +297,8 @@ legend("topright", c("low", "high", "full"), pch = c(15, 17, 19), border = NA)
 #
 if (verbose == 1) {  cat("Counts\n"); }
 
+namesarg <- expres$time
+
 tmgr <- data.frame(tmains = c("Ratio overlap/red", "Ratio overlap/green(low)", "Ratio overlap/green(high)", "Ratio overlap/green(full)", "Ratio overlap/obj", "Ratio red/obj", "Ratio green/obj(low)", "Ratio green/obj(high)", "Ratio green/obj(full)"), greps = c("^red_counts", "^low_green_counts", "^high_green_counts", "^full_green_counts", "^vol_counts", "^cvol_counts", "^low_evol_counts", "^high_evol_counts", "^full_evol_counts"), stringsAsFactors=F)
 
 apply(tmgr, 1, FUN = function(arg) {
@@ -308,8 +310,6 @@ apply(tmgr, 1, FUN = function(arg) {
 # Object areas
 #
 if (verbose == 1) { cat("Sizes\n"); }
-
-namesarg <- expres$time
 
 tmgr <- data.frame(tmains = c("Sizes obj", "Sizes red", "Sizes low green", "Sizes high green", "Sizes full green", "Sizes overlap"), greps = c("^size_obj", "^size_red", "^size_low_green", "^size_high_green", "^size_full_green", "^size_overlap"), stringsAsFactors=F)
 
