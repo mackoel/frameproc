@@ -49,8 +49,12 @@ real_area_green <- qdata$green_mask_notempty * opts$realsize * opts$realsize
 real_radius_green <- sqrt(qdata$green_mask_notempty/pi) * opts$realsize
 real_area_overlap <- qdata$overlap_mask_notempty * opts$realsize * opts$realsize
 real_radius_overlap <- sqrt(qdata$overlap_mask_notempty/pi) * opts$realsize
-qdata$green_mean <- qdata$green_cum / qdata$green_mask_notempty
-qdata$red_mean <- qdata$red_cum / qdata$red_mask_notempty
+green_mean <- qdata$green_mask_cum / qdata$green_mask_notempty
+red_mean <- qdata$red_mask_cum / qdata$red_mask_notempty
+qdata$green_mean <- qdata$green_mask_mean
+qdata[qdata$green_mask_notempty > 0,]$green_mean <- green_mean[qdata$green_mask_notempty > 0]
+qdata$red_mean <- qdata$red_mask_mean
+qdata[qdata$red_mask_notempty > 0,]$red_mean <- red_mean[qdata$red_mask_notempty > 0]
 qdata <- cbind(qdata, coloc_red, coloc_green, coloc_vol, coloc_cvol, coloc_evol, real_area_obj, real_radius_obj, real_area_red, real_radius_red, real_area_green, real_radius_green, real_area_overlap, real_radius_overlap)
 write.csv(file=outfile, qdata, row.names=F)
 
