@@ -49,8 +49,8 @@ real_area_green <- qdata$green_mask_notempty * opts$realsize * opts$realsize
 real_radius_green <- sqrt(qdata$green_mask_notempty/pi) * opts$realsize
 real_area_overlap <- qdata$overlap_mask_notempty * opts$realsize * opts$realsize
 real_radius_overlap <- sqrt(qdata$overlap_mask_notempty/pi) * opts$realsize
-green_mean <- qdata$green_mask_cum / qdata$green_mask_notempty
-red_mean <- qdata$red_mask_cum / qdata$red_mask_notempty
+green_mean <- qdata$green_mask_muc / qdata$green_mask_notempty
+red_mean <- qdata$red_mask_muc / qdata$red_mask_notempty
 qdata$green_mean <- qdata$green_mask_mean
 qdata[qdata$green_mask_notempty > 0,]$green_mean <- green_mean[qdata$green_mask_notempty > 0]
 qdata$red_mean <- qdata$red_mask_mean
