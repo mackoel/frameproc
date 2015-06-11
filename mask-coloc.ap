@@ -257,7 +257,7 @@ label=qu3d
 info=0;549;1430;30;35;0;0;0;0;0;0;0;0;0;
 id=/home/kkozlov/TSA/15-01_15-05/ch01-res-6/temp
 type=OUS
-file=file:///storage2/kkozlov/Calcs/summ.ap/eea1-slozthr/output/-15_merged_counts.csv
+file=file:///storage2/kkozlov/Calcs/summ.ap/eea1-slozthr/output/-merged_counts-15.csv
 server=default
 delay=600
 vip=0
@@ -424,7 +424,7 @@ vip=0
 label=OPEN-red
 
 [Node:380]
-info=0;282;16;30;35;0;0;0;0;0;0;0;0;1;
+info=0;282;16;30;35;0;0;0;0;0;0;0;0;0;
 id=-depth 8 -channel R -separate
 type=PAM
 file=.any
@@ -506,7 +506,7 @@ vip=0
 label=invert
 
 [Node:445]
-info=0;198;179;30;35;0;0;0;0;0;0;0;0;0;
+info=0;198;214;30;35;0;0;0;0;0;0;0;0;0;
 id=-depth 8 -channel R -separate
 type=PAM
 file=.any
@@ -519,7 +519,7 @@ vip=0
 label=convert
 
 [Node:446]
-info=0;439;204;30;35;0;0;0;0;0;0;0;0;0;
+info=0;523;219;30;35;0;0;0;0;0;0;0;0;0;
 id=-depth 8 -channel R -separate
 type=PAM
 file=.any
