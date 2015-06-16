@@ -16,6 +16,8 @@ library(optparse)
 
 GREEN <- 1
 RED <- 2
+YELLOWON <- 3
+YELLOWOFF <- 4
 
 aggr_func_dco <- function(cell, datatab) {
 	result <- cor(datatab[datatab$cell == cell,]$green_mean, datatab[datatab$cell == cell,]$red_mean, method = 'pearson')
@@ -39,7 +41,11 @@ aggr_func_sum_objects <- function(cell, datatab, channel, threshold = 0, lowgree
 		D = (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
 	} else if (channel == RED) {
 		D = (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
-	} 
+	} else if (channel == YELLOWON) {
+		D = (datatab[datatab$cell == cell,]$overlap_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
+	} else if (channel == YELLOWOFF) {
+		D = (datatab[datatab$cell == cell,]$overlap_mask_notempty < threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen) * (datatab[datatab$cell == cell,]$red_mask_notempty > 0)
+	}
 	result <- sum(D)
 	return(result)
 }
@@ -61,6 +67,8 @@ aggr_func_sum_pixels <- function(cell, datatab, channel, lowgreen = 0, highgreen
 		P = datatab[datatab$cell == cell,]$green_mask_notempty * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
 	} else if (channel == RED) {
 		P = datatab[datatab$cell == cell,]$red_mask_notempty
+	} else if (channel == YELLOWON) {
+		P = datatab[datatab$cell == cell,]$overlap_mask_notempty * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
 	} 
 	result <- sum(P)
 	return(result)
@@ -306,24 +314,34 @@ nuc <- sapply(var_k, FUN=aggr_func_sum_objects, datatab=qdata, channel=GREEN, lo
 restab <- cbind(restab, NumGreenObjHigh=nuc)
 nuc <- sapply(var_k, FUN=aggr_func_sum_objects, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
 restab <- cbind(restab, NumGreenObjFull=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_objects, datatab=qdata, channel=YELLOWON, lowgreen = lowgreen, highgreen = highgreen)
+restab <- cbind(restab, NumOverlapObjLow=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_objects, datatab=qdata, channel=YELLOWON, lowgreen = highgreen, highgreen = 255)
+restab <- cbind(restab, NumOverlapObjHigh=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_objects, datatab=qdata, channel=YELLOWON, lowgreen = lowgreen, highgreen = 255)
+restab <- cbind(restab, NumOverlapObjFull=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_objects, datatab=qdata, channel=YELLOWOFF, lowgreen = lowgreen, highgreen = highgreen, threshold = 0.1)
+restab <- cbind(restab, NumNonOverlapObjLow=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_objects, datatab=qdata, channel=YELLOWOFF, lowgreen = highgreen, highgreen = 255, threshold = 0.1)
+restab <- cbind(restab, NumNonOverlapObjHigh=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_objects, datatab=qdata, channel=YELLOWOFF, lowgreen = lowgreen, highgreen = 255, threshold = 0.1)
+restab <- cbind(restab, NumNonOverlapObjFull=nuc)
 #
 # Cumulative intensities
 #
 nuc <- sapply(var_k, FUN=aggr_func_sum_intensity, datatab=qdata, channel=RED)
-restab <- cbind(restab, RedMean=nuc)
+restab <- cbind(restab, RedTotal=nuc)
 nuc <- sapply(var_k, FUN=aggr_func_sum_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = highgreen)
-restab <- cbind(restab, GreenMeanLow=nuc)
+restab <- cbind(restab, GreenTotalLow=nuc)
 nuc <- sapply(var_k, FUN=aggr_func_sum_intensity, datatab=qdata, channel=GREEN, lowgreen = highgreen, highgreen = 255)
-restab <- cbind(restab, GreenMeanHigh=nuc)
+restab <- cbind(restab, GreenTotalHigh=nuc)
 nuc <- sapply(var_k, FUN=aggr_func_sum_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
-restab <- cbind(restab, GreenMeanFull=nuc)
+restab <- cbind(restab, GreenTotalFull=nuc)
 #
 # Cumulative areas
 #
 nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$m000)
 restab <- cbind(restab, AreaPix=nuc)
-nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$overlap_mask_notempty)
-restab <- cbind(restab, OverlapPix=nuc)
 nuc <- sapply(var_k, FUN=aggr_func_sum, datatab=qdata, datacolmn=qdata$red_mask_notempty)
 restab <- cbind(restab, RedPix=nuc)
 nuc <- sapply(var_k, FUN=aggr_func_sum_pixels, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = highgreen)
@@ -332,6 +350,12 @@ nuc <- sapply(var_k, FUN=aggr_func_sum_pixels, datatab=qdata, channel=GREEN, low
 restab <- cbind(restab, GreenPixHigh=nuc)
 nuc <- sapply(var_k, FUN=aggr_func_sum_pixels, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
 restab <- cbind(restab, GreenPixFull=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_pixels, datatab=qdata, channel=YELLOWON, lowgreen = lowgreen, highgreen = highgreen)
+restab <- cbind(restab, OverlapPixLow=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_pixels, datatab=qdata, channel=YELLOWON, lowgreen = highgreen, highgreen = 255)
+restab <- cbind(restab, OverlapPixHigh=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_pixels, datatab=qdata, channel=YELLOWON, lowgreen = lowgreen, highgreen = 255)
+restab <- cbind(restab, OverlapPixFull=nuc)
 #
 # Save table
 #

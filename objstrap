@@ -1,0 +1,25 @@
+#!/usr/bin/Rscript --silent
+# This script is a splitted 3 step from frame-proc - stats per cell
+rem <- function(...) invisible(T)
+rem( '
+Rscript.exe "%~F0" "%~F1" "%~F2"
+EXIT /B
+rem ')
+### above=BAT, below=R
+library(optparse)
+
+option_list <- list(
+	make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
+	help="Print extra output [default=false]")
+)
+opt_parser <- OptionParser(usage = "usage: %prog [options]", option_list = option_list, description = "Post-proc object table", epilogue = "Send feedback to mackoel@gmail.com")
+flaggs <- parse_args(opt_parser, args = commandArgs(trailingOnly = TRUE), print_help_and_exit = TRUE, positional_arguments = TRUE)
+opts <- flaggs$options
+args <- flaggs$args
+infile <- args[1]
+outfile <- args[2]
+qdata <- read.csv(infile)
+wdata <- data.frame(AreaFull=qdata$m000, AreaOverlap=qdata$overlap_mask_notempty, AreaRed=qdata$red_mask_notempty, MeanRed=qdata$red_mean, MinRed=qdata$red_min, MaxRed=qdata$red_max, IntDenRed=qdata$red_mask_muc, AreaGreen=qdata$green_mask_notempty, MeanGreen=qdata$green_mean, MinGreen=qdata$green_min, MaxGreen=qdata$green_max, IntDenGreen=qdata$green_mask_muc)
+rownames(wdata) <- qdata$Number
+write.csv(file=outfile, wdata, row.names=T)
+
