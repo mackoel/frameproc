@@ -20,7 +20,7 @@ YELLOWON <- 3
 YELLOWOFF <- 4
 
 aggr_func_dco <- function(cell, datatab) {
-	result <- cor(datatab[datatab$cell == cell,]$green_mean, datatab[datatab$cell == cell,]$red_mean, method = 'pearson')
+	result <- cor(datatab[datatab$cell == cell,]$green_mask_mean, datatab[datatab$cell == cell,]$red_mask_mean, method = 'pearson')
 	return(result)
 }
 
@@ -38,24 +38,35 @@ aggr_func_nuc <- function(cell, datatab) {
 aggr_func_sum_objects <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
 	D <- c()
 	if (channel == GREEN) {
-		D = (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
+		D = (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen)
 	} else if (channel == RED) {
 		D = (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
 	} else if (channel == YELLOWON) {
-		D = (datatab[datatab$cell == cell,]$overlap_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
+		D = (datatab[datatab$cell == cell,]$overlap_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen)
 	} else if (channel == YELLOWOFF) {
-		D = (datatab[datatab$cell == cell,]$overlap_mask_notempty < threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen) * (datatab[datatab$cell == cell,]$red_mask_notempty > 0)
+		D = (datatab[datatab$cell == cell,]$overlap_mask_notempty < threshold) * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen) * (datatab[datatab$cell == cell,]$red_mask_notempty > 0)
 	}
 	result <- sum(D)
 	return(result)
 }
 
-aggr_func_sum_intensity <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
+aggr_func_sum_mean_intensity <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
 	I <- c()
 	if (channel == GREEN) {
-		I = datatab[datatab$cell == cell,]$green_mean * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
+		I = datatab[datatab$cell == cell,]$green_mask_mean * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
 	} else if (channel == RED) {
-		I = datatab[datatab$cell == cell,]$red_mean * (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
+		I = datatab[datatab$cell == cell,]$red_mask_mean * (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
+	}
+	result <- sum(I)
+	return(result)
+}
+
+aggr_func_sum_muc_intensity <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
+	I <- c()
+	if (channel == GREEN) {
+		I = datatab[datatab$cell == cell,]$green_mask_muc * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
+	} else if (channel == RED) {
+		I = datatab[datatab$cell == cell,]$red_mask_muc * (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
 	}
 	result <- sum(I)
 	return(result)
@@ -64,11 +75,11 @@ aggr_func_sum_intensity <- function(cell, datatab, channel, threshold = 0, lowgr
 aggr_func_sum_pixels <- function(cell, datatab, channel, lowgreen = 0, highgreen = 255) {
 	P <- c()
 	if (channel == GREEN) {
-		P = datatab[datatab$cell == cell,]$green_mask_notempty * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
+		P = datatab[datatab$cell == cell,]$green_mask_notempty * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen)
 	} else if (channel == RED) {
 		P = datatab[datatab$cell == cell,]$red_mask_notempty
 	} else if (channel == YELLOWON) {
-		P = datatab[datatab$cell == cell,]$overlap_mask_notempty * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
+		P = datatab[datatab$cell == cell,]$overlap_mask_notempty * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen)
 	} 
 	result <- sum(P)
 	return(result)
@@ -101,13 +112,26 @@ aggr_func_hist_size <- function(cell, datatab, datacolmn, sizebreaks, sizestep) 
 	return(result)
 }
 
-aggr_func_manders_intensity <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
+aggr_func_manders_muc_intensity <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
 	if (channel == GREEN) {
-		G = datatab[datatab$cell == cell,]$green_mean * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
+		G = datatab[datatab$cell == cell,]$green_mask_muc * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
 		R = G * (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
 	} else if (channel == RED) {
-		G = datatab[datatab$cell == cell,]$red_mean
-		R = G * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
+		G = datatab[datatab$cell == cell,]$red_mask_muc
+		R = G * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen)
+	}
+#	print(data.frame(R, G))
+	result <- sum(R)/sum(G)
+	return(result)
+}
+
+aggr_func_manders_mean_intensity <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
+	if (channel == GREEN) {
+		G = datatab[datatab$cell == cell,]$green_mask_mean * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
+		R = G * (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
+	} else if (channel == RED) {
+		G = datatab[datatab$cell == cell,]$red_mask_mean
+		R = G * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen)
 	}
 #	print(data.frame(R, G))
 	result <- sum(R)/sum(G)
@@ -116,11 +140,11 @@ aggr_func_manders_intensity <- function(cell, datatab, channel, threshold = 0, l
 
 aggr_func_manders_objects <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
 	if (channel == GREEN) {
-		G = (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
+		G = (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen)
 		R = G * (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
 	} else if (channel == RED) {
 		G = (datatab[datatab$cell == cell,]$red_mask_notempty > threshold)
-		R = G * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mean <= highgreen)
+		R = G * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold) * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen)
 	}
 #	print(data.frame(R, G))
 	result <- sum(R)/sum(G)
@@ -152,13 +176,18 @@ opts <- flaggs$options
 args <- flaggs$args
 lowgreen <- opts$lowgreen
 highgreen <- opts$highgreen
+# Input/output
 infile <- args[1]
 outfile <- args[2]
+# Read data
 qdata <- read.csv(infile)
+# Fix columns
 colnames(qdata) <- sub("eea1", "green", colnames(qdata))
 colnames(qdata) <- sub("egfr", "red", colnames(qdata))
 colnames(qdata) <- sub("cort", "red", colnames(qdata))
+# List of cells
 var_k <- unique(qdata$cell)
+# Number of cells
 OPTIMALK <- length(var_k)
 STARTK <- var_k[1]
 cat(infile, "OPTIMALK", OPTIMALK, "\n");
@@ -169,9 +198,9 @@ if (OPTIMALK == 0) {
 #
 # Filtered tables
 #
-qdata_low_green <- qdata[(qdata$green_mean > lowgreen) & (qdata$green_mean <= highgreen),]
-qdata_high_green <- qdata[(qdata$green_mean > highgreen) & (qdata$green_mean <= 255),]
-qdata_full_green <- qdata[(qdata$green_mean > lowgreen) & (qdata$green_mean <= 255),]
+qdata_low_green <- qdata[(qdata$green_mask_mean > lowgreen) & (qdata$green_mask_mean <= highgreen),]
+qdata_high_green <- qdata[(qdata$green_mask_mean > highgreen) & (qdata$green_mask_mean <= 255),]
+qdata_full_green <- qdata[(qdata$green_mask_mean > lowgreen) & (qdata$green_mask_mean <= 255),]
 #
 # Correlations
 #
@@ -182,14 +211,14 @@ cco.high <- sapply(var_k, FUN=aggr_func_cco, datatab=qdata_high_green)
 dco.full <- sapply(var_k, FUN=aggr_func_dco, datatab=qdata_full_green)
 cco.full <- sapply(var_k, FUN=aggr_func_cco, datatab=qdata_full_green)
 #
-# Manders coefficients for intensities
+# Manders coefficients for total intensities
 #
-manders.int.green.low <- sapply(var_k, FUN=aggr_func_manders_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = highgreen)
-manders.int.green.high <- sapply(var_k, FUN=aggr_func_manders_intensity, datatab=qdata, channel=GREEN, lowgreen = highgreen, highgreen = 255)
-manders.int.green.full <- sapply(var_k, FUN=aggr_func_manders_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
-manders.int.red.low <- sapply(var_k, FUN=aggr_func_manders_intensity, datatab=qdata, channel=RED, lowgreen = lowgreen, highgreen = highgreen)
-manders.int.red.high <- sapply(var_k, FUN=aggr_func_manders_intensity, datatab=qdata, channel=RED, lowgreen = highgreen, highgreen = 255)
-manders.int.red.full <- sapply(var_k, FUN=aggr_func_manders_intensity, datatab=qdata, channel=RED, lowgreen = lowgreen, highgreen = 255)
+manders.int.green.low <- sapply(var_k, FUN=aggr_func_manders_muc_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = highgreen)
+manders.int.green.high <- sapply(var_k, FUN=aggr_func_manders_muc_intensity, datatab=qdata, channel=GREEN, lowgreen = highgreen, highgreen = 255)
+manders.int.green.full <- sapply(var_k, FUN=aggr_func_manders_muc_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
+manders.int.red.low <- sapply(var_k, FUN=aggr_func_manders_muc_intensity, datatab=qdata, channel=RED, lowgreen = lowgreen, highgreen = highgreen)
+manders.int.red.high <- sapply(var_k, FUN=aggr_func_manders_muc_intensity, datatab=qdata, channel=RED, lowgreen = highgreen, highgreen = 255)
+manders.int.red.full <- sapply(var_k, FUN=aggr_func_manders_muc_intensity, datatab=qdata, channel=RED, lowgreen = lowgreen, highgreen = 255)
 #
 # Manders coefficients for object counts
 #
@@ -199,6 +228,15 @@ manders.obj.green.full <- sapply(var_k, FUN=aggr_func_manders_objects, datatab=q
 manders.obj.red.low <- sapply(var_k, FUN=aggr_func_manders_objects, datatab=qdata, channel=RED, lowgreen = lowgreen, highgreen = highgreen)
 manders.obj.red.high <- sapply(var_k, FUN=aggr_func_manders_objects, datatab=qdata, channel=RED, lowgreen = highgreen, highgreen = 255)
 manders.obj.red.full <- sapply(var_k, FUN=aggr_func_manders_objects, datatab=qdata, channel=RED, lowgreen = lowgreen, highgreen = 255)
+#
+# Manders coefficients for mean intensities
+#
+manders.mint.green.low <- sapply(var_k, FUN=aggr_func_manders_mean_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = highgreen)
+manders.mint.green.high <- sapply(var_k, FUN=aggr_func_manders_mean_intensity, datatab=qdata, channel=GREEN, lowgreen = highgreen, highgreen = 255)
+manders.mint.green.full <- sapply(var_k, FUN=aggr_func_manders_mean_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
+manders.mint.red.low <- sapply(var_k, FUN=aggr_func_manders_mean_intensity, datatab=qdata, channel=RED, lowgreen = lowgreen, highgreen = highgreen)
+manders.mint.red.high <- sapply(var_k, FUN=aggr_func_manders_mean_intensity, datatab=qdata, channel=RED, lowgreen = highgreen, highgreen = 255)
+manders.mint.red.full <- sapply(var_k, FUN=aggr_func_manders_mean_intensity, datatab=qdata, channel=RED, lowgreen = lowgreen, highgreen = 255)
 #
 # Control time set to -1
 #
@@ -230,7 +268,13 @@ restab <- data.frame(
 	manders.obj.green.full = manders.obj.green.full,
 	manders.obj.red.low = manders.obj.red.low,
 	manders.obj.red.high = manders.obj.red.high,
-	manders.obj.red.full = manders.obj.red.full
+	manders.obj.red.full = manders.obj.red.full,
+	manders.mint.green.low = manders.mint.green.low,
+	manders.mint.green.high = manders.mint.green.high,
+	manders.mint.green.full = manders.mint.green.full,
+	manders.mint.red.low = manders.mint.red.low,
+	manders.mint.red.high = manders.mint.red.high,
+	manders.mint.red.full = manders.mint.red.full
 	)
 #
 # Ratio histograms
@@ -329,14 +373,25 @@ restab <- cbind(restab, NumNonOverlapObjFull=nuc)
 #
 # Cumulative intensities
 #
-nuc <- sapply(var_k, FUN=aggr_func_sum_intensity, datatab=qdata, channel=RED)
+nuc <- sapply(var_k, FUN=aggr_func_sum_muc_intensity, datatab=qdata, channel=RED)
 restab <- cbind(restab, RedTotal=nuc)
-nuc <- sapply(var_k, FUN=aggr_func_sum_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = highgreen)
+nuc <- sapply(var_k, FUN=aggr_func_sum_muc_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = highgreen)
 restab <- cbind(restab, GreenTotalLow=nuc)
-nuc <- sapply(var_k, FUN=aggr_func_sum_intensity, datatab=qdata, channel=GREEN, lowgreen = highgreen, highgreen = 255)
+nuc <- sapply(var_k, FUN=aggr_func_sum_muc_intensity, datatab=qdata, channel=GREEN, lowgreen = highgreen, highgreen = 255)
 restab <- cbind(restab, GreenTotalHigh=nuc)
-nuc <- sapply(var_k, FUN=aggr_func_sum_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
+nuc <- sapply(var_k, FUN=aggr_func_sum_muc_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
 restab <- cbind(restab, GreenTotalFull=nuc)
+#
+# Cumulative intensities
+#
+nuc <- sapply(var_k, FUN=aggr_func_sum_mean_intensity, datatab=qdata, channel=RED)
+restab <- cbind(restab, RedMeanTotal=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_mean_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = highgreen)
+restab <- cbind(restab, GreenMeanTotalLow=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_mean_intensity, datatab=qdata, channel=GREEN, lowgreen = highgreen, highgreen = 255)
+restab <- cbind(restab, GreenMeanTotalHigh=nuc)
+nuc <- sapply(var_k, FUN=aggr_func_sum_mean_intensity, datatab=qdata, channel=GREEN, lowgreen = lowgreen, highgreen = 255)
+restab <- cbind(restab, GreenMeanTotalFull=nuc)
 #
 # Cumulative areas
 #

@@ -22,12 +22,16 @@ opt_parser <- OptionParser(usage = "usage: %prog [options]", option_list = optio
 flaggs <- parse_args(opt_parser, args = commandArgs(trailingOnly = TRUE), print_help_and_exit = TRUE, positional_arguments = TRUE)
 opts <- flaggs$options
 args <- flaggs$args
+# Input/output
 infile <- args[1]
 outfile <- args[2]
+# Read data
 qdata <- read.csv(infile)
+# Fix column names
 colnames(qdata) <- sub("eea1", "green", colnames(qdata))
 colnames(qdata) <- sub("egfr", "red", colnames(qdata))
 colnames(qdata) <- sub("cort", "red", colnames(qdata))
+# Fix number of cells
 if ("cell" %in% colnames(qdata)) {
 	cat (infile, "cell column present\n")
 	OPTIMALK <- max(qdata$cell)
@@ -36,11 +40,13 @@ if ("cell" %in% colnames(qdata)) {
 	OPTIMALK <- 1
 	qdata <- cbind(qdata, cell=rep(1, times=dim(qdata)[1]))
 }
+# Calculate ratios
 coloc_red <- qdata$overlap_mask_notempty/qdata$red_mask_notempty
 coloc_green <- qdata$overlap_mask_notempty/qdata$green_mask_notempty
 coloc_vol <- qdata$overlap_mask_notempty/qdata$m000
 coloc_cvol <- qdata$red_mask_notempty/qdata$m000
 coloc_evol <- qdata$green_mask_notempty/qdata$m000
+# Calculate real sizes
 real_area_obj <- qdata$m000 * opts$realsize * opts$realsize
 real_radius_obj <- sqrt(qdata$m000/pi) * opts$realsize
 real_area_red <- qdata$red_mask_notempty * opts$realsize * opts$realsize
@@ -49,12 +55,17 @@ real_area_green <- qdata$green_mask_notempty * opts$realsize * opts$realsize
 real_radius_green <- sqrt(qdata$green_mask_notempty/pi) * opts$realsize
 real_area_overlap <- qdata$overlap_mask_notempty * opts$realsize * opts$realsize
 real_radius_overlap <- sqrt(qdata$overlap_mask_notempty/pi) * opts$realsize
+# Re-Calculate means over channel masks
 green_mean <- qdata$green_mask_muc / qdata$green_mask_notempty
 red_mean <- qdata$red_mask_muc / qdata$red_mask_notempty
 qdata$green_mean <- qdata$green_mask_mean
 qdata[qdata$green_mask_notempty > 0,]$green_mean <- green_mean[qdata$green_mask_notempty > 0]
 qdata$red_mean <- qdata$red_mask_mean
 qdata[qdata$red_mask_notempty > 0,]$red_mean <- red_mean[qdata$red_mask_notempty > 0]
+# Store propely
+qdata$red_mask_mean <- qdata$red_mean
+qdata$green_mask_mean <- qdata$green_mean
+# Bind new columns
 qdata <- cbind(qdata, coloc_red, coloc_green, coloc_vol, coloc_cvol, coloc_evol, real_area_obj, real_radius_obj, real_area_red, real_radius_red, real_area_green, real_radius_green, real_area_overlap, real_radius_overlap)
 write.csv(file=outfile, qdata, row.names=F)
 
