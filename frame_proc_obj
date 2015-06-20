@@ -58,13 +58,8 @@ real_radius_overlap <- sqrt(qdata$overlap_mask_notempty/pi) * opts$realsize
 # Re-Calculate means over channel masks
 green_mean <- qdata$green_mask_muc / qdata$green_mask_notempty
 red_mean <- qdata$red_mask_muc / qdata$red_mask_notempty
-qdata$green_mean <- qdata$green_mask_mean
-qdata[qdata$green_mask_notempty > 0,]$green_mean <- green_mean[qdata$green_mask_notempty > 0]
-qdata$red_mean <- qdata$red_mask_mean
-qdata[qdata$red_mask_notempty > 0,]$red_mean <- red_mean[qdata$red_mask_notempty > 0]
-# Store propely
-qdata$red_mask_mean <- qdata$red_mean
-qdata$green_mask_mean <- qdata$green_mean
+qdata[qdata$green_mask_notempty > 0,]$green_mask_mean <- green_mean[qdata$green_mask_notempty > 0]
+qdata[qdata$red_mask_notempty > 0,]$red_mask_mean <- red_mean[qdata$red_mask_notempty > 0]
 # Bind new columns
 qdata <- cbind(qdata, coloc_red, coloc_green, coloc_vol, coloc_cvol, coloc_evol, real_area_obj, real_radius_obj, real_area_red, real_radius_red, real_area_green, real_radius_green, real_area_overlap, real_radius_overlap)
 write.csv(file=outfile, qdata, row.names=F)
