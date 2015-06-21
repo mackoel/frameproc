@@ -281,7 +281,7 @@ restab <- data.frame(
 	manders.obj.green.full = manders.obj.green.full,
 	manders.obj.red.low = manders.obj.red.low,
 	manders.obj.red.high = manders.obj.red.high,
-	manders.obj.red.full = manders.obj.red.full,
+	manders.obj.red.full = manders.obj.red.full
 	)
 #
 # Ratio histograms
