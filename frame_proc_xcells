@@ -154,7 +154,7 @@ aggr_func_manders_objects <- function(cell, datatab, channel, threshold = 0, low
 aggr_func_manders_intensity <- function(cell, datatab, channel, threshold = 0, lowgreen = 0, highgreen = 255) {
 	if (channel == GREEN) {
 		R = datatab[datatab$cell == cell,]$green_overlap_muc * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
-		G = datatab[datatab$cell == cell,]$green_mask_muc
+		G = datatab[datatab$cell == cell,]$green_mask_muc * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
 	} else if (channel == RED) {
 		R = datatab[datatab$cell == cell,]$red_overlap_muc * (datatab[datatab$cell == cell,]$green_mask_mean > lowgreen) * (datatab[datatab$cell == cell,]$green_mask_mean <= highgreen) * (datatab[datatab$cell == cell,]$green_mask_notempty > threshold)
 		G = datatab[datatab$cell == cell,]$red_mask_muc
